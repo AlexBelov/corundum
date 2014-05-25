@@ -143,11 +143,11 @@ for_expression_list : expression terminator
                     | for_expression_list BREAK terminator
                     ;
 
-assignment : lvalue ASSIGN rvalue
+assignment : lvalue op=ASSIGN rvalue
              {
               definitions.add($lvalue.text);
              }
-           | lvalue ( PLUS_ASSIGN | MINUS_ASSIGN | MUL_ASSIGN | DIV_ASSIGN | MOD_ASSIGN | EXP_ASSIGN ) rvalue
+           | lvalue op=( PLUS_ASSIGN | MINUS_ASSIGN | MUL_ASSIGN | DIV_ASSIGN | MOD_ASSIGN | EXP_ASSIGN ) rvalue
              {
               String variable = $lvalue.text;
               if (!is_defined(definitions, variable)) {
@@ -184,8 +184,8 @@ array_selector : id LEFT_SBRACKET rvalue RIGHT_SBRACKET
                | function_call LEFT_SBRACKET rvalue RIGHT_SBRACKET
                ;
 
-int_result : int_result ( MUL | DIV | MOD ) int_result
-           | int_result ( PLUS | MINUS ) int_result
+int_result : int_result op=( MUL | DIV | MOD ) int_result
+           | int_result op=( PLUS | MINUS ) int_result
            | int_t
            ;
 
