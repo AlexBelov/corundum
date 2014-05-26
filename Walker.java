@@ -13,12 +13,13 @@ public class Walker {
     Stack<Integer> stack = new Stack<Integer>();
     //Integer need_pop = 1;
 
-    public void enterAssignment(CorundumParser.AssignmentContext ctx) {
-        System.out.println(".local int " + ctx.lvalue.getText());
+    public void enterInt_assignment(CorundumParser.Int_assignmentContext ctx) {
+        System.out.println(".local int " + ctx.var_id.getText());
     }
 
-    public void exitAssignment(CorundumParser.AssignmentContext ctx) {
-        System.out.println(ctx.lvalue.getText() + " " + ctx.op.getText() + " " + stack.pop());
+    public void exitInt_assignment(CorundumParser.Int_assignmentContext ctx) {
+        String str = ctx.var_id.getText() + " " + ctx.op.getText() + " " + stack.pop();
+        System.out.println(str);
     }
 
     // public void exitRvalue(CorundumParser.RvalueContext ctx) {
@@ -29,7 +30,7 @@ public class Walker {
     // }
 
     public void exitInt_result(CorundumParser.Int_resultContext ctx) {
-        if ( ctx.getChildCount()==3 ) { // operations have 3 children
+        if ( ctx.getChildCount() == 3 && ctx.op != null ) { // operation node
             int right = stack.pop();
             int left = stack.pop();
 

@@ -107,19 +107,25 @@ function_call_params : rvalue
                      | function_call_params COMMA rvalue
                      ;
 
-if_elsif_statement : ELSIF rvalue crlf expression_list
-                   | ELSIF rvalue crlf expression_list ELSE crlf expression_list
-                   | ELSIF rvalue crlf expression_list if_elsif_statement
+if_elsif_statement : ELSIF rvalue crlf elsif_expression_list
+                   | ELSIF rvalue crlf elsif_expression_list ELSE crlf elsif_expression_list
+                   | ELSIF rvalue crlf elsif_expression_list if_elsif_statement
                    ;
 
-if_statement : IF rvalue crlf expression_list END
-             | IF rvalue THEN expression_list END
-             | IF rvalue crlf expression_list ELSE crlf expression_list END
-             | IF rvalue THEN expression_list ELSE expression_list END
-             | IF rvalue crlf expression_list if_elsif_statement END
+elsif_expression_list : expression_list;
+
+if_statement : IF rvalue crlf if_expression_list END
+             | IF rvalue THEN if_expression_list END
+             | IF rvalue crlf if_expression_list ELSE crlf if_expression_list END
+             | IF rvalue THEN if_expression_list ELSE if_expression_list END
+             | IF rvalue crlf if_expression_list if_elsif_statement END
              ;
 
-unless_statement : UNLESS rvalue crlf expression_list END;
+if_expression_list : expression_list;
+
+unless_statement : UNLESS rvalue crlf unless_expression_list END;
+
+unless_expression_list : expression_list;
 
 while_statement : WHILE rvalue crlf while_expression_list END;
 
@@ -131,9 +137,15 @@ while_expression_list : expression terminator
                       | while_expression_list BREAK terminator
                       ;
 
-for_statement : FOR LEFT_RBRACKET expression SEMICOLON expression SEMICOLON expression RIGHT_RBRACKET crlf for_expression_list END
-              | FOR expression SEMICOLON expression SEMICOLON expression crlf for_expression_list END
+for_statement : FOR LEFT_RBRACKET init_expression SEMICOLON cond_expression SEMICOLON loop_expression RIGHT_RBRACKET crlf for_expression_list END
+              | FOR init_expression SEMICOLON cond_expression SEMICOLON loop_expression crlf for_expression_list END
               ;
+
+init_expression : expression;
+
+cond_expression : expression;
+
+loop_expression : expression;
 
 for_expression_list : expression terminator
                     | RETRY terminator
@@ -156,6 +168,22 @@ assignment : lvalue op=ASSIGN rvalue
               }         
              }
            ;
+
+dynamic_assignment : lvalue op=ASSIGN dynamic_result
+                   | lvalue op=( PLUS_ASSIGN | MINUS_ASSIGN | MUL_ASSIGN | DIV_ASSIGN | MOD_ASSIGN | EXP_ASSIGN ) dynamic_result
+                   ;
+
+int_assignment : var_id=lvalue op=ASSIGN int_result
+               | var_id=lvalue op=( PLUS_ASSIGN | MINUS_ASSIGN | MUL_ASSIGN | DIV_ASSIGN | MOD_ASSIGN | EXP_ASSIGN ) int_result
+               ;
+
+float_assignment : lvalue op=ASSIGN float_result
+                 | lvalue op=( PLUS_ASSIGN | MINUS_ASSIGN | MUL_ASSIGN | DIV_ASSIGN | MOD_ASSIGN | EXP_ASSIGN ) float_result
+                 ;
+
+string_assignment : lvalue op=ASSIGN string_result
+                  | lvalue op=( PLUS_ASSIGN | MINUS_ASSIGN | MUL_ASSIGN | DIV_ASSIGN | MOD_ASSIGN | EXP_ASSIGN ) string_result
+                  ;
 
 array_assignment : lvalue array_definition ASSIGN rvalue
                    {
@@ -184,8 +212,30 @@ array_selector : id LEFT_SBRACKET rvalue RIGHT_SBRACKET
                | function_call LEFT_SBRACKET rvalue RIGHT_SBRACKET
                ;
 
+dynamic_result : dynamic_result op=( MUL | DIV | MOD ) int_result
+               | dynamic_result op=( PLUS | MINUS ) int_result
+               | int_result op=( MUL | DIV | MOD ) dynamic_result
+               | int_result op=( PLUS | MINUS ) dynamic_result
+               | dynamic_result ( MUL | DIV | MOD ) float_result
+               | dynamic_result ( PLUS | MINUS )  float_result
+               | float_result ( MUL | DIV | MOD ) dynamic_result
+               | float_result ( PLUS | MINUS )  dynamic_result
+               | dynamic_result MUL string_result
+               | string_result MUL dynamic_result
+               | dynamic_result op=( MUL | DIV | MOD ) dynamic_result
+               | dynamic_result op=( PLUS | MINUS ) dynamic_result
+               | LEFT_RBRACKET dynamic_result RIGHT_RBRACKET
+               | dynamic
+               ;
+
+dynamic : id
+        | id_global
+        | function_call
+        ;
+
 int_result : int_result op=( MUL | DIV | MOD ) int_result
            | int_result op=( PLUS | MINUS ) int_result
+           | LEFT_RBRACKET int_result RIGHT_RBRACKET       
            | int_t
            ;
 
@@ -195,6 +245,7 @@ float_result : float_result ( MUL | DIV | MOD ) float_result
              | float_result ( PLUS | MINUS ) float_result
              | int_result ( PLUS | MINUS )  float_result
              | float_result ( PLUS | MINUS )  int_result
+             | LEFT_RBRACKET float_result RIGHT_RBRACKET
              | float_t
              ;
 
@@ -221,7 +272,12 @@ rvalue : lvalue
        | float_result
        | string_result
 
-       | assignment       
+       | dynamic_assignment
+       | string_assignment
+       | float_assignment
+       | int_assignment
+       | assignment    
+
        | function_call
        | literal_t
        | bool_t
