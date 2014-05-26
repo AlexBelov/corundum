@@ -129,8 +129,8 @@ float_assignment : var_id=lvalue op=ASSIGN float_result
                  | var_id=lvalue op=( PLUS_ASSIGN | MINUS_ASSIGN | MUL_ASSIGN | DIV_ASSIGN | MOD_ASSIGN | EXP_ASSIGN ) float_result
                  ;
 
-string_assignment : lvalue op=ASSIGN string_result
-                  | lvalue op=( PLUS_ASSIGN | MINUS_ASSIGN | MUL_ASSIGN | DIV_ASSIGN | MOD_ASSIGN | EXP_ASSIGN ) string_result
+string_assignment : var_id=lvalue op=ASSIGN string_result
+                  | var_id=lvalue op=PLUS_ASSIGN string_result
                   ;
 
 array_assignment : lvalue array_definition ASSIGN rvalue
@@ -187,8 +187,9 @@ float_result : float_result op=( MUL | DIV | MOD ) float_result
              | float_t
              ;
 
-string_result : string_result MUL int_result
-              | int_result MUL string_result
+string_result : string_result op=MUL int_result
+              | int_result op=MUL string_result
+              | string_result op=PLUS string_result
               | literal_t
               ;
 

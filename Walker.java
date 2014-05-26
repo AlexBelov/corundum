@@ -27,6 +27,13 @@ public class Walker {
             return true;
         }
 
+        public static String repeat(String s, int times) {
+            if (times <= 0) return "";
+            else return s + repeat(s, times-1);
+        }
+
+        // ======================================== Integer ========================================
+
         public void enterInt_assignment(CorundumParser.Int_assignmentContext ctx) {
             switch(ctx.op.getType()) {
                 case CorundumParser.ASSIGN:
@@ -94,6 +101,8 @@ public class Walker {
             int_values.put(ctx, int_values.get(ctx.getChild(0)));
             which_value.put(ctx, which_value.get(ctx.getChild(0)));
         }
+
+        // ======================================== Float ========================================
 
         public void enterFloat_assignment(CorundumParser.Float_assignmentContext ctx) {
             switch(ctx.op.getType()) {
@@ -181,6 +190,87 @@ public class Walker {
             which_value.put(ctx, which_value.get(ctx.getChild(0)));
         }
 
+        // ======================================== String ========================================
+
+        public void enterString_assignment(CorundumParser.String_assignmentContext ctx) {
+            switch(ctx.op.getType()) {
+                case CorundumParser.ASSIGN:
+                    String var = ctx.var_id.getText();
+                    if (!is_defined(definitions, var)) {
+                        System.out.println(".local string " + ctx.var_id.getText());
+                        definitions.add(ctx.var_id.getText());
+                    }
+                    break;
+                default:
+                    var = ctx.var_id.getText();
+                    if (!is_defined(definitions, var)) {
+                        System.out.println("line " + NumStr + " Error! Undefined variable " + var + "!");
+                        SemanticErrorsNum++;
+                    }
+                    break;
+            }
+        }
+
+        public void exitString_assignment(CorundumParser.String_assignmentContext ctx) {
+            String str = ctx.var_id.getText() + " " + ctx.op.getText() + " \"" + string_values.get(ctx.getChild(2)) + "\"";
+            System.out.println(str);
+        }
+
+        public void exitString_result(CorundumParser.String_resultContext ctx) {
+            if ( ctx.getChildCount() == 3 && ctx.op != null ) { // operation node
+
+                int times = 0;
+                String left_s = "";
+                String right_s = "";
+                String str = "";
+
+                switch(which_value.get(ctx.getChild(0))) {
+                    case "Integer":
+                        times = int_values.get(ctx.getChild(0));
+                        break;
+                    case "String":
+                        left_s = string_values.get(ctx.getChild(0));
+                        str = left_s;
+                        break;
+                }
+
+                switch(which_value.get(ctx.getChild(2))) {
+                    case "Integer":
+                        times = int_values.get(ctx.getChild(2));
+                        break;
+                    case "String":
+                        right_s = string_values.get(ctx.getChild(2));
+                        str = right_s;
+                        break;
+                }
+
+                switch(ctx.op.getType()) {
+                    case CorundumParser.MUL:
+                        string_values.put(ctx, (String) repeat(str, times));
+                        which_value.put(ctx, "String");
+                        break;
+                    case CorundumParser.PLUS:
+                        string_values.put(ctx, (String) left_s + right_s);
+                        which_value.put(ctx, "String");
+                        break;
+                }
+            }
+            else if ( ctx.getChildCount() == 1 ) { // near-terminal node
+                string_values.put(ctx, string_values.get(ctx.getChild(0)));
+                which_value.put(ctx, "String");
+            }
+            else if ( ctx.getChildCount() == 3 && ctx.op == null ) { // node with brackets
+                string_values.put(ctx, string_values.get(ctx.getChild(1)));
+                which_value.put(ctx, "String");
+            }
+        }
+
+        public void exitLiteral_t(CorundumParser.Literal_tContext ctx) {
+            string_values.put(ctx, string_values.get(ctx.getChild(0)));
+            which_value.put(ctx, which_value.get(ctx.getChild(0)));
+        }
+
+        // ======================================== Terminal node ========================================
 
         public void visitTerminal(TerminalNode node) {
             Token symbol = node.getSymbol();
@@ -194,7 +284,11 @@ public class Walker {
                     which_value.put(node, "Float");
                     break;
                 case CorundumParser.LITERAL:
-                    string_values.put(node, String.valueOf(symbol.getText()));
+                    String str_terminal;
+                    str_terminal = String.valueOf(symbol.getText());
+                    str_terminal = str_terminal.replaceAll("\"", "");
+                    str_terminal = str_terminal.replaceAll("\'", "");
+                    string_values.put(node, str_terminal);
                     which_value.put(node, "String");
                     break;
             }
