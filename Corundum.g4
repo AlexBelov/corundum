@@ -107,27 +107,27 @@ function_call_params : rvalue
                      | function_call_params COMMA rvalue
                      ;
 
-if_elsif_statement : ELSIF rvalue crlf elsif_expression_list
-                   | ELSIF rvalue crlf elsif_expression_list ELSE crlf elsif_expression_list
-                   | ELSIF rvalue crlf elsif_expression_list if_elsif_statement
+if_elsif_statement : ELSIF comparison_list crlf elsif_expression_list
+                   | ELSIF comparison_list crlf elsif_expression_list ELSE crlf elsif_expression_list
+                   | ELSIF comparison_list crlf elsif_expression_list if_elsif_statement
                    ;
 
 elsif_expression_list : expression_list;
 
-if_statement : IF rvalue crlf if_expression_list END
-             | IF rvalue THEN if_expression_list END
-             | IF rvalue crlf if_expression_list ELSE crlf if_expression_list END
-             | IF rvalue THEN if_expression_list ELSE if_expression_list END
-             | IF rvalue crlf if_expression_list if_elsif_statement END
+if_statement : IF comparison_list crlf if_expression_list END
+             | IF comparison_list THEN if_expression_list END
+             | IF comparison_list crlf if_expression_list ELSE crlf if_expression_list END
+             | IF comparison_list THEN if_expression_list ELSE if_expression_list END
+             | IF comparison_list crlf if_expression_list if_elsif_statement END
              ;
 
 if_expression_list : expression_list;
 
-unless_statement : UNLESS rvalue crlf unless_expression_list END;
+unless_statement : UNLESS comparison_list crlf unless_expression_list END;
 
 unless_expression_list : expression_list;
 
-while_statement : WHILE rvalue crlf while_expression_list END;
+while_statement : WHILE comparison_list crlf while_expression_list END;
 
 while_expression_list : expression terminator
                       | RETRY terminator
@@ -143,7 +143,7 @@ for_statement : FOR LEFT_RBRACKET init_expression SEMICOLON cond_expression SEMI
 
 init_expression : expression;
 
-cond_expression : expression;
+cond_expression : comparison_list;
 
 loop_expression : expression;
 
@@ -253,6 +253,18 @@ string_result : string_result MUL int_result
               | int_result MUL string_result
               | literal_t
               ;
+
+comparison_list : comparison BIT_AND comparison_list
+                | comparison AND comparison_list
+                | comparison BIT_OR comparison_list
+                | comparison OR comparison_list
+                | LEFT_RBRACKET comparison_list RIGHT_RBRACKET
+                | comparison
+                ;
+
+comparison : rvalue ( LESS | GREATER | LESS_EQUAL | GREATER_EQUAL ) rvalue
+           | rvalue ( EQUAL | NOT_EQUAL ) rvalue
+           ;
 
 lvalue : id  
        | id_global        
