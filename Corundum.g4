@@ -311,7 +311,7 @@ literal_t : LITERAL;
 
 float_t : FLOAT;
 
-int_t : INT # Int;
+int_t : INT;
 
 bool_t : TRUE
        | FALSE
