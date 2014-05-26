@@ -37,28 +37,7 @@ function_definition : function_definition_header function_definition_body END;
 function_definition_body : expression_list;
 
 function_definition_header : DEF function_name crlf
-                             {
-                              String func = $function_name.text;
-                              if (is_defined(definitions, func)) {
-                                System.out.println("line " + NumStr + " Error! Function " + func + " is already defined!");
-
-                                SemanticErrorsNum++;
-                              } 
-                              else {
-                                definitions.add(func);
-                              }
-                             }
                            | DEF function_name function_definition_params crlf
-                             {
-                              String func = $function_name.text;
-                              if (is_defined(definitions, func)) {
-                                System.out.println("line " + NumStr + " Error! Function " + func + " is already defined!");
-                                SemanticErrorsNum++;
-                              } 
-                              else {
-                                definitions.add(func);
-                              }
-                             }
                            ;
 
 function_name : id_function
@@ -76,29 +55,8 @@ function_definition_params_list : id
 return_statement : RETURN rvalue;
 
 function_call : function_name LEFT_RBRACKET function_call_param_list RIGHT_RBRACKET
-                {
-                  String func = $function_name.text;
-                  if (!is_defined(definitions, func)) {
-                    System.out.println("line " + NumStr + " Error! Undefined function " + func + "!");
-                    SemanticErrorsNum++;
-                  }
-                } # FunctionCall
               | function_name function_call_param_list
-                {
-                  String func = $function_name.text;
-                  if (!is_defined(definitions, func)) {
-                    System.out.println("line " + NumStr + " Error! Undefined function " + func + "!");
-                    SemanticErrorsNum++;
-                  }
-                } # FunctionCall
               | function_name LEFT_RBRACKET RIGHT_RBRACKET
-                {
-                  String func = $function_name.text;
-                  if (!is_defined(definitions, func)) {
-                    System.out.println("line " + NumStr + " Error! Undefined function " + func + "!");
-                    SemanticErrorsNum++;
-                  }
-                } # FunctionCall
               ;
 
 function_call_param_list : function_call_params;
@@ -156,17 +114,7 @@ for_expression_list : expression terminator
                     ;
 
 assignment : lvalue op=ASSIGN rvalue
-             {
-              definitions.add($lvalue.text);
-             }
            | lvalue op=( PLUS_ASSIGN | MINUS_ASSIGN | MUL_ASSIGN | DIV_ASSIGN | MOD_ASSIGN | EXP_ASSIGN ) rvalue
-             {
-              String variable = $lvalue.text;
-              if (!is_defined(definitions, variable)) {
-                System.out.println("line " + NumStr + " Error! Undefined variable " + variable + "!");
-                SemanticErrorsNum++;
-              }         
-             }
            ;
 
 dynamic_assignment : lvalue op=ASSIGN dynamic_result
@@ -186,17 +134,7 @@ string_assignment : lvalue op=ASSIGN string_result
                   ;
 
 array_assignment : lvalue array_definition ASSIGN rvalue
-                   {
-                    String variable = $lvalue.text;
-                    if (!is_defined(definitions, variable)) {
-                      System.out.println("line " + NumStr + " Error! Undefined variable " + variable + "!");
-                      SemanticErrorsNum++;
-                    }
-                   }
                  | lvalue ASSIGN array_definition
-                   {
-                    definitions.add($lvalue.text);
-                   }
                  ;
 
 array_definition : LEFT_SBRACKET array_definition_elements RIGHT_SBRACKET
@@ -271,13 +209,7 @@ lvalue : id
        ;
 
 rvalue : lvalue 
-         {
-          String variable = $lvalue.text;
-          if (!is_defined(definitions, variable)) {
-            System.out.println("line " + NumStr + " Error! Undefined variable " + variable + "!");
-            SemanticErrorsNum++;
-          }
-         }       
+
        | array_assignment
 
        | int_result
@@ -343,11 +275,7 @@ terminator : terminator SEMICOLON
            | crlf
            ;
 
-crlf : CRLF
-       {
-        NumStr++;
-       }
-     ;
+crlf : CRLF;
 
 fragment ESCAPED_QUOTE : '\\"';
 LITERAL : '"' ( ESCAPED_QUOTE | ~('\n'|'\r') )*? '"'

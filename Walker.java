@@ -12,8 +12,35 @@ public class Walker {
     public static class Evaluator extends CorundumBaseListener {
         ParseTreeProperty<Integer> values = new ParseTreeProperty<Integer>();
 
+        public int SemanticErrorsNum = 0;
+        public int NumStr = 1;
+        java.util.LinkedList<String> definitions = new java.util.LinkedList<String>();
+
+        public static boolean is_defined(java.util.LinkedList<String> definitions, String variable) {
+            int index = definitions.indexOf(variable);
+            if (index == -1) {
+                return false;
+            }
+            return true;
+        }
+
         public void enterInt_assignment(CorundumParser.Int_assignmentContext ctx) {
-            System.out.println(".local int " + ctx.var_id.getText());
+            switch(ctx.op.getType()) {
+                case CorundumParser.ASSIGN:
+                    String var = ctx.var_id.getText();
+                    if (!is_defined(definitions, var)) {
+                        System.out.println(".local int " + ctx.var_id.getText());
+                        definitions.add(ctx.var_id.getText());
+                    }
+                    break;
+                default:
+                    var = ctx.var_id.getText();
+                    if (!is_defined(definitions, var)) {
+                        System.out.println("line " + NumStr + " Error! Undefined variable " + var + "!");
+                        SemanticErrorsNum++;
+                    }
+                    break;
+            }
         }
 
         public void exitInt_assignment(CorundumParser.Int_assignmentContext ctx) {
@@ -62,6 +89,10 @@ public class Walker {
             if ( symbol.getType()==CorundumParser.INT ) {
                 values.put(node, Integer.valueOf(symbol.getText()));
             }
+        }
+
+        public void exitCrlf(CorundumParser.CrlfContext ctx) {
+            NumStr++;
         }
     }
 
