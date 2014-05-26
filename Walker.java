@@ -17,6 +17,7 @@ public class Walker {
 
         public int SemanticErrorsNum = 0;
         public int NumStr = 1;
+        public int Num_reg = 0;
         java.util.LinkedList<String> definitions = new java.util.LinkedList<String>();
 
         public static boolean is_defined(java.util.LinkedList<String> definitions, String variable) {
@@ -270,6 +271,115 @@ public class Walker {
             which_value.put(ctx, which_value.get(ctx.getChild(0)));
         }
 
+        // ======================================== Dynamic assignment ========================================
+
+        public void enterDynamic_assignment(CorundumParser.Dynamic_assignmentContext ctx) {
+            switch(ctx.op.getType()) {
+                case CorundumParser.ASSIGN:
+                    String var = ctx.var_id.getText();
+                    if (!is_defined(definitions, var)) {
+                        System.out.println(".local pmc " + ctx.var_id.getText());
+                        System.out.println(ctx.var_id.getText() + " = new \"Integer\"");
+                        definitions.add(ctx.var_id.getText());
+                        Num_reg = 0;
+                    }
+                    break;
+                default:
+                    var = ctx.var_id.getText();
+                    if (!is_defined(definitions, var)) {
+                        System.out.println("line " + NumStr + " Error! Undefined variable " + var + "!");
+                        SemanticErrorsNum++;
+                    }
+                    break;
+            }
+        }
+
+        public void exitDynamic_assignment(CorundumParser.Dynamic_assignmentContext ctx) {
+            String str = ctx.var_id.getText() + " " + ctx.op.getText() + " " + string_values.get(ctx.getChild(2));
+            Num_reg = 0;
+            System.out.println(str);
+        }
+
+        public void exitDynamic_result(CorundumParser.Dynamic_resultContext ctx) {
+            if ( ctx.getChildCount() == 3 && ctx.op != null ) { // operation node
+
+                int int_dyn = 0;
+                float float_dyn = 0;
+                String str_dyn = "";
+                String str_dyn_1 = "";
+                String another_node = "";
+                String str_output = "";
+
+                switch(which_value.get(ctx.getChild(0))) {
+                    case "Integer":
+                        int_dyn = int_values.get(ctx.getChild(0));
+                        another_node = string_values.get(ctx.getChild(2));
+                        str_output = "$P" + Num_reg + " = " + another_node + " " + ctx.op.getText() + " " + int_dyn;                  
+                        break;
+                    case "Float":
+                        float_dyn = float_values.get(ctx.getChild(0));
+                        another_node = string_values.get(ctx.getChild(2));
+                        str_output = "$P" + Num_reg + " = " + another_node + " " + ctx.op.getText() + " " + float_dyn;
+                        break;
+                    case "String":
+                        str_dyn = string_values.get(ctx.getChild(0));
+                        another_node = string_values.get(ctx.getChild(2));
+                        str_output = "$P" + Num_reg + " = " + another_node + " " + ctx.op.getText() + " " + str_dyn;
+                        break;
+                    case "Dynamic":
+                        str_dyn_1 = string_values.get(ctx.getChild(0));
+                        switch(which_value.get(ctx.getChild(2))) {
+                            case "Integer":
+                                int_dyn = int_values.get(ctx.getChild(2));
+                                str_output = "$P" + Num_reg + " = " + str_dyn_1 + " " + ctx.op.getText() + " " + int_dyn;                  
+                                break;
+                            case "Float":
+                                float_dyn = float_values.get(ctx.getChild(2));
+                                str_output = "$P" + Num_reg + " = " + str_dyn_1 + " " + ctx.op.getText() + " " + float_dyn;
+                                break;
+                            case "String":
+                                str_dyn = string_values.get(ctx.getChild(2));
+                                str_output = "$P" + Num_reg + " = " + str_dyn_1 + " " + ctx.op.getText() + " " + str_dyn;
+                                break;
+                            case "Dynamic":
+                                str_dyn = string_values.get(ctx.getChild(2));
+                                str_output = "$P" + Num_reg + " = " + str_dyn_1 + " " + ctx.op.getText() + " " + str_dyn;
+                                break;
+                        }
+                        break;
+                }
+
+                System.out.println("$P" + Num_reg + " = new \"Integer\"");
+                System.out.println(str_output);
+                string_values.put(ctx, "$P" + Num_reg);
+                which_value.put(ctx, "Dynamic");
+                Num_reg++;
+                
+            }
+            else if ( ctx.getChildCount() == 1 ) { // near-terminal node
+                string_values.put(ctx, string_values.get(ctx.getChild(0)));
+                which_value.put(ctx, "Dynamic");
+            }
+            else if ( ctx.getChildCount() == 3 && ctx.op == null ) { // node with brackets
+                string_values.put(ctx, string_values.get(ctx.getChild(1)));
+                which_value.put(ctx, "Dynamic");
+            }
+        }
+
+        public void exitDynamic(CorundumParser.DynamicContext ctx) {
+            String str_dyn_term = string_values.get(ctx.getChild(0));
+            System.out.println("$P" + Num_reg + " = new \"Integer\"");
+            System.out.println("$P" + Num_reg + " = " + str_dyn_term);
+            string_values.put(ctx, "$P" + Num_reg);
+            Num_reg++;
+            which_value.put(ctx, which_value.get(ctx.getChild(0)));
+        }
+
+        public void exitId(CorundumParser.IdContext ctx) {
+            string_values.put(ctx, string_values.get(ctx.getChild(0)));
+            which_value.put(ctx, which_value.get(ctx.getChild(0)));
+        }
+
         // ======================================== Terminal node ========================================
 
         public void visitTerminal(TerminalNode node) {
@@ -291,13 +401,23 @@ public class Walker {
                     string_values.put(node, str_terminal);
                     which_value.put(node, "String");
                     break;
+                case CorundumParser.ID:
+                    str_terminal = String.valueOf(symbol.getText());
+                    string_values.put(node, str_terminal);
+                    which_value.put(node, "Dynamic");
+                    //System.out.println(str_terminal);
+                    break;
             }
         }
+
+        // ======================================== New line ========================================
 
         public void exitCrlf(CorundumParser.CrlfContext ctx) {
             NumStr++;
         }
     }
+
+    // ======================================== Main ========================================
 
     public static void main(String[] args) throws Exception {
         String inputFile = null;

@@ -117,8 +117,8 @@ assignment : lvalue op=ASSIGN rvalue
            | lvalue op=( PLUS_ASSIGN | MINUS_ASSIGN | MUL_ASSIGN | DIV_ASSIGN | MOD_ASSIGN | EXP_ASSIGN ) rvalue
            ;
 
-dynamic_assignment : lvalue op=ASSIGN dynamic_result
-                   | lvalue op=( PLUS_ASSIGN | MINUS_ASSIGN | MUL_ASSIGN | DIV_ASSIGN | MOD_ASSIGN | EXP_ASSIGN ) dynamic_result
+dynamic_assignment : var_id=lvalue op=ASSIGN dynamic_result
+                   | var_id=lvalue op=( PLUS_ASSIGN | MINUS_ASSIGN | MUL_ASSIGN | DIV_ASSIGN | MOD_ASSIGN | EXP_ASSIGN ) dynamic_result
                    ;
 
 int_assignment : var_id=lvalue op=ASSIGN int_result
@@ -151,16 +151,16 @@ array_selector : id LEFT_SBRACKET rvalue RIGHT_SBRACKET
                ;
 
 dynamic_result : dynamic_result op=( MUL | DIV | MOD ) int_result
-               | dynamic_result op=( PLUS | MINUS ) int_result
                | int_result op=( MUL | DIV | MOD ) dynamic_result
-               | int_result op=( PLUS | MINUS ) dynamic_result
-               | dynamic_result ( MUL | DIV | MOD ) float_result
-               | dynamic_result ( PLUS | MINUS )  float_result
-               | float_result ( MUL | DIV | MOD ) dynamic_result
-               | float_result ( PLUS | MINUS )  dynamic_result
-               | dynamic_result MUL string_result
-               | string_result MUL dynamic_result
+               | dynamic_result op=( MUL | DIV | MOD ) float_result
+               | float_result op=( MUL | DIV | MOD ) dynamic_result
                | dynamic_result op=( MUL | DIV | MOD ) dynamic_result
+               | dynamic_result op=MUL string_result
+               | string_result op=MUL dynamic_result
+               | dynamic_result op=( PLUS | MINUS ) int_result
+               | int_result op=( PLUS | MINUS ) dynamic_result
+               | dynamic_result op=( PLUS | MINUS )  float_result               
+               | float_result op=( PLUS | MINUS )  dynamic_result                      
                | dynamic_result op=( PLUS | MINUS ) dynamic_result
                | LEFT_RBRACKET dynamic_result RIGHT_RBRACKET
                | dynamic
