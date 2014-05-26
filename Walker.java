@@ -10,7 +10,10 @@ import java.util.Stack;
 
 public class Walker {
     public static class Evaluator extends CorundumBaseListener {
-        ParseTreeProperty<Integer> values = new ParseTreeProperty<Integer>();
+        ParseTreeProperty<Integer> int_values = new ParseTreeProperty<Integer>();
+        ParseTreeProperty<Float> float_values = new ParseTreeProperty<Float>();
+        ParseTreeProperty<String> string_values = new ParseTreeProperty<String>();
+        ParseTreeProperty<String> which_value = new ParseTreeProperty<String>();
 
         public int SemanticErrorsNum = 0;
         public int NumStr = 1;
@@ -44,50 +47,156 @@ public class Walker {
         }
 
         public void exitInt_assignment(CorundumParser.Int_assignmentContext ctx) {
-            String str = ctx.var_id.getText() + " " + ctx.op.getText() + " " + values.get(ctx.getChild(2));
+            String str = ctx.var_id.getText() + " " + ctx.op.getText() + " " + int_values.get(ctx.getChild(2));
             System.out.println(str);
         }
 
         public void exitInt_result(CorundumParser.Int_resultContext ctx) {
             if ( ctx.getChildCount() == 3 && ctx.op != null ) { // operation node
 
-                int left = values.get(ctx.getChild(0));
-                int right = values.get(ctx.getChild(2));
+                int left = int_values.get(ctx.getChild(0));
+                int right = int_values.get(ctx.getChild(2));
 
                 switch(ctx.op.getType()) {
                     case CorundumParser.MUL:
-                        values.put(ctx, left * right);
+                        int_values.put(ctx, left * right);
+                        which_value.put(ctx, "Integer");
                         break;
                     case CorundumParser.DIV:
-                        values.put(ctx, left / right);
+                        int_values.put(ctx, left / right);
+                        which_value.put(ctx, "Integer");
                         break;
                     case CorundumParser.MOD:
-                        values.put(ctx, left % right);
+                        int_values.put(ctx, left % right);
+                        which_value.put(ctx, "Integer");
                         break;
                     case CorundumParser.PLUS:
-                        values.put(ctx, left + right);
+                        int_values.put(ctx, left + right);
+                        which_value.put(ctx, "Integer");
                         break;
                     case CorundumParser.MINUS:
-                        values.put(ctx, left - right);
+                        int_values.put(ctx, left - right);
+                        which_value.put(ctx, "Integer");
                         break;
                 }
             }
             else if ( ctx.getChildCount() == 1 ) { // near-terminal node
-                values.put(ctx, values.get(ctx.getChild(0)));
+                int_values.put(ctx, int_values.get(ctx.getChild(0)));
+                which_value.put(ctx, "Integer");
             }
             else if ( ctx.getChildCount() == 3 && ctx.op == null ) { // node with brackets
-                values.put(ctx, values.get(ctx.getChild(1)));
+                int_values.put(ctx, int_values.get(ctx.getChild(1)));
+                which_value.put(ctx, "Integer");
             }
         }
 
         public void exitInt_t(CorundumParser.Int_tContext ctx) {
-            values.put(ctx, values.get(ctx.getChild(0)));
+            int_values.put(ctx, int_values.get(ctx.getChild(0)));
+            which_value.put(ctx, which_value.get(ctx.getChild(0)));
         }
+
+        public void enterFloat_assignment(CorundumParser.Float_assignmentContext ctx) {
+            switch(ctx.op.getType()) {
+                case CorundumParser.ASSIGN:
+                    String var = ctx.var_id.getText();
+                    if (!is_defined(definitions, var)) {
+                        System.out.println(".local num " + ctx.var_id.getText());
+                        definitions.add(ctx.var_id.getText());
+                    }
+                    break;
+                default:
+                    var = ctx.var_id.getText();
+                    if (!is_defined(definitions, var)) {
+                        System.out.println("line " + NumStr + " Error! Undefined variable " + var + "!");
+                        SemanticErrorsNum++;
+                    }
+                    break;
+            }
+        }
+
+        public void exitFloat_assignment(CorundumParser.Float_assignmentContext ctx) {
+            String str = ctx.var_id.getText() + " " + ctx.op.getText() + " " + float_values.get(ctx.getChild(2));
+            System.out.println(str);
+        }
+
+        public void exitFloat_result(CorundumParser.Float_resultContext ctx) {
+            if ( ctx.getChildCount() == 3 && ctx.op != null ) { // operation node
+
+                float left = 0;
+                float right = 0;
+
+                switch(which_value.get(ctx.getChild(0))) {
+                    case "Integer":
+                        left = (float) int_values.get(ctx.getChild(0));
+                        break;
+                    case "Float":
+                        left = float_values.get(ctx.getChild(0));
+                        break;
+                }
+
+                switch(which_value.get(ctx.getChild(2))) {
+                    case "Integer":
+                        right = (float) int_values.get(ctx.getChild(2));
+                        break;
+                    case "Float":
+                        right = float_values.get(ctx.getChild(2));
+                        break;
+                }
+
+                switch(ctx.op.getType()) {
+                    case CorundumParser.MUL:
+                        float_values.put(ctx, left * right);
+                        which_value.put(ctx, "Float");
+                        break;
+                    case CorundumParser.DIV:
+                        float_values.put(ctx, left / right);
+                        which_value.put(ctx, "Float");
+                        break;
+                    case CorundumParser.MOD:
+                        float_values.put(ctx, left % right);
+                        which_value.put(ctx, "Float");
+                        break;
+                    case CorundumParser.PLUS:
+                        float_values.put(ctx, left + right);
+                        which_value.put(ctx, "Float");
+                        break;
+                    case CorundumParser.MINUS:
+                        float_values.put(ctx, left - right);
+                        which_value.put(ctx, "Float");
+                        break;
+                }
+            }
+            else if ( ctx.getChildCount() == 1 ) { // near-terminal node
+                float_values.put(ctx, float_values.get(ctx.getChild(0)));
+                which_value.put(ctx, "Float");
+            }
+            else if ( ctx.getChildCount() == 3 && ctx.op == null ) { // node with brackets
+                float_values.put(ctx, float_values.get(ctx.getChild(1)));
+                which_value.put(ctx, "Float");
+            }
+        }
+
+        public void exitFloat_t(CorundumParser.Float_tContext ctx) {
+            float_values.put(ctx, float_values.get(ctx.getChild(0)));
+            which_value.put(ctx, which_value.get(ctx.getChild(0)));
+        }
+
 
         public void visitTerminal(TerminalNode node) {
             Token symbol = node.getSymbol();
-            if ( symbol.getType()==CorundumParser.INT ) {
-                values.put(node, Integer.valueOf(symbol.getText()));
+            switch(symbol.getType()) {
+                case CorundumParser.INT:
+                    int_values.put(node, Integer.valueOf(symbol.getText()));
+                    which_value.put(node, "Integer");
+                    break;
+                case CorundumParser.FLOAT:
+                    float_values.put(node, Float.valueOf(symbol.getText()));
+                    which_value.put(node, "Float");
+                    break;
+                case CorundumParser.LITERAL:
+                    string_values.put(node, String.valueOf(symbol.getText()));
+                    which_value.put(node, "String");
+                    break;
             }
         }
 

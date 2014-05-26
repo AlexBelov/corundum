@@ -125,8 +125,8 @@ int_assignment : var_id=lvalue op=ASSIGN int_result
                | var_id=lvalue op=( PLUS_ASSIGN | MINUS_ASSIGN | MUL_ASSIGN | DIV_ASSIGN | MOD_ASSIGN | EXP_ASSIGN ) int_result
                ;
 
-float_assignment : lvalue op=ASSIGN float_result
-                 | lvalue op=( PLUS_ASSIGN | MINUS_ASSIGN | MUL_ASSIGN | DIV_ASSIGN | MOD_ASSIGN | EXP_ASSIGN ) float_result
+float_assignment : var_id=lvalue op=ASSIGN float_result
+                 | var_id=lvalue op=( PLUS_ASSIGN | MINUS_ASSIGN | MUL_ASSIGN | DIV_ASSIGN | MOD_ASSIGN | EXP_ASSIGN ) float_result
                  ;
 
 string_assignment : lvalue op=ASSIGN string_result
@@ -177,12 +177,12 @@ int_result : int_result op=( MUL | DIV | MOD ) int_result
            | int_t
            ;
 
-float_result : float_result ( MUL | DIV | MOD ) float_result
-             | int_result ( MUL | DIV | MOD ) float_result
-             | float_result ( MUL | DIV | MOD ) int_result
-             | float_result ( PLUS | MINUS ) float_result
-             | int_result ( PLUS | MINUS )  float_result
-             | float_result ( PLUS | MINUS )  int_result
+float_result : float_result op=( MUL | DIV | MOD ) float_result
+             | int_result op=( MUL | DIV | MOD ) float_result
+             | float_result op=( MUL | DIV | MOD ) int_result
+             | float_result op=( PLUS | MINUS ) float_result
+             | int_result op=( PLUS | MINUS )  float_result
+             | float_result op=( PLUS | MINUS )  int_result
              | LEFT_RBRACKET float_result RIGHT_RBRACKET
              | float_t
              ;
