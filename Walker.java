@@ -43,7 +43,8 @@ public class Walker {
                 case CorundumParser.ASSIGN:
                     String var = ctx.var_id.getText();
                     if (!is_defined(definitions, var)) {
-                        System.out.println(".local int " + ctx.var_id.getText());
+                        System.out.println(".local pmc " + ctx.var_id.getText());
+                        System.out.println(ctx.var_id.getText() + " = new \"Integer\"");
                         definitions.add(ctx.var_id.getText());
                     }
                     break;
@@ -113,7 +114,8 @@ public class Walker {
                 case CorundumParser.ASSIGN:
                     String var = ctx.var_id.getText();
                     if (!is_defined(definitions, var)) {
-                        System.out.println(".local num " + ctx.var_id.getText());
+                        System.out.println(".local pmc " + ctx.var_id.getText());
+                        System.out.println(ctx.var_id.getText() + " = new \"Float\"");
                         definitions.add(ctx.var_id.getText());
                     }
                     break;
@@ -201,7 +203,8 @@ public class Walker {
                 case CorundumParser.ASSIGN:
                     String var = ctx.var_id.getText();
                     if (!is_defined(definitions, var)) {
-                        System.out.println(".local string " + ctx.var_id.getText());
+                        System.out.println(".local pmc " + ctx.var_id.getText());
+                        System.out.println(ctx.var_id.getText() + " = new \"String\"");
                         definitions.add(ctx.var_id.getText());
                     }
                     break;
@@ -395,7 +398,13 @@ public class Walker {
         }
 
         public void exitArray_assignment(CorundumParser.Array_assignmentContext ctx) {
-            System.out.println(ctx.getText());
+            String var = ctx.var_id.getText();
+
+            System.out.println(var + ctx.arr_def.getText() + " = " + ctx.arr_val.getText());
+            if (!is_defined(definitions, var)) {
+                System.out.println("line " + NumStr + " Error! Undefined variable " + var + "!");
+                SemanticErrorsNum++;
+            }
         }
 
         public void exitArray_selector(CorundumParser.Array_selectorContext ctx) {
@@ -423,6 +432,23 @@ public class Walker {
 
         public void exitElse_token(CorundumParser.Else_tokenContext ctx) {
             System.out.println("label_" + stack_labels.pop() + ":");
+        }
+
+        // ======================================== UNLESS statement ========================================
+
+        public void enterUnless_statement(CorundumParser.Unless_statementContext ctx) {
+            Num_label++;
+            System.out.println("unless " + ctx.getChild(1).getText() + " goto label_" + Num_label);
+            Num_label++;
+            System.out.println("goto label_" + Num_label + ":");
+            System.out.println("label_" + (Num_label - 1) + ":");
+            stack_labels.push(Num_label);
+        }
+
+        public void exitUnless_statement(CorundumParser.Unless_statementContext ctx) {      
+            if (!ctx.getChild(4).getText().contains("else")) {
+                System.out.println("label_" + stack_labels.pop() + ":");
+            }
         }
 
         // ======================================== FOR loop ========================================

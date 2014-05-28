@@ -69,9 +69,10 @@ if_expression_list : expression terminator
                    | if_expression_list BREAK terminator
                    ;
 
-unless_statement : UNLESS comparison_list crlf unless_expression_list END;
-
-unless_expression_list : expression_list;
+unless_statement : UNLESS comparison_list crlf if_expression_list END
+                 | UNLESS comparison_list crlf if_expression_list else_token crlf if_expression_list END
+                 | UNLESS comparison_list crlf if_expression_list if_elsif_statement END
+                 ;
 
 while_statement : WHILE comparison_list crlf while_expression_list END;
 
@@ -123,7 +124,7 @@ string_assignment : var_id=lvalue op=ASSIGN string_result
 
 initial_array_assignment : var_id=lvalue op=ASSIGN LEFT_SBRACKET RIGHT_SBRACKET;
 
-array_assignment : var_id=lvalue array_definition op=ASSIGN array_value;
+array_assignment : var_id=lvalue arr_def=array_definition op=ASSIGN arr_val=array_value;
 
 array_definition : LEFT_SBRACKET array_definition_elements RIGHT_SBRACKET;
 
