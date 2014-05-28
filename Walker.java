@@ -15,9 +15,12 @@ public class Walker {
         ParseTreeProperty<String> string_values = new ParseTreeProperty<String>();
         ParseTreeProperty<String> which_value = new ParseTreeProperty<String>();
 
+        Stack<Integer> stack_labels = new Stack<Integer>();
+
         public int SemanticErrorsNum = 0;
         public int NumStr = 1;
         public int Num_reg = 0;
+        public int Num_label = 0;
         java.util.LinkedList<String> definitions = new java.util.LinkedList<String>();
 
         public static boolean is_defined(java.util.LinkedList<String> definitions, String variable) {
@@ -399,6 +402,33 @@ public class Walker {
             String var_selector = ctx.getText();
             string_values.put(ctx, var_selector);
             which_value.put(ctx, "Dynamic");
+        }
+
+        // ======================================== IF statement ========================================
+
+        public void enterIf_statement(CorundumParser.If_statementContext ctx) {
+            Num_label++;
+            System.out.println("if " + ctx.getChild(1).getText() + " goto label_" + Num_label);
+            Num_label++;
+            System.out.println("goto label_" + Num_label + ":");
+            System.out.println("label_" + (Num_label - 1) + ":");
+            stack_labels.push(Num_label);
+        }
+
+        public void exitIf_statement(CorundumParser.If_statementContext ctx) {      
+            if (!ctx.getChild(4).getText().contains("else")) {
+                System.out.println("label_" + stack_labels.pop() + ":");
+            }
+        }
+
+        public void exitElse_token(CorundumParser.Else_tokenContext ctx) {
+            System.out.println("label_" + stack_labels.pop() + ":");
+        }
+
+        // ======================================== FOR loop ========================================
+
+        public void enterFor_statement(CorundumParser.For_statementContext ctx) {
+            System.out.println("FOR");
         }
 
         // ======================================== Terminal node ========================================

@@ -18,3 +18,19 @@ mas[1] = 5
 mas[2] = "String"
 
 a = mas[2]
+
+if a == 1
+	a = 2
+	if b == 2
+		b = 3
+	end
+else
+	a = 3
+end
+
+# for(i = 0; i<10; i+=1)
+# 	a = 1
+# 	if a == 1
+# 		break
+# 	end
+# end

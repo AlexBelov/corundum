@@ -51,21 +51,23 @@ function_call_params : rvalue
                      | function_call_params COMMA rvalue
                      ;
 
-if_elsif_statement : ELSIF comparison_list crlf elsif_expression_list
-                   | ELSIF comparison_list crlf elsif_expression_list ELSE crlf elsif_expression_list
-                   | ELSIF comparison_list crlf elsif_expression_list if_elsif_statement
+if_elsif_statement : ELSIF comparison_list crlf if_expression_list
+                   | ELSIF comparison_list crlf if_expression_list else_token crlf if_expression_list
+                   | ELSIF comparison_list crlf if_expression_list if_elsif_statement
                    ;
 
-elsif_expression_list : expression_list;
-
 if_statement : IF comparison_list crlf if_expression_list END
-             | IF comparison_list THEN if_expression_list END
-             | IF comparison_list crlf if_expression_list ELSE crlf if_expression_list END
-             | IF comparison_list THEN if_expression_list ELSE if_expression_list END
+             | IF comparison_list crlf if_expression_list else_token crlf if_expression_list END
              | IF comparison_list crlf if_expression_list if_elsif_statement END
              ;
 
-if_expression_list : expression_list;
+if_expression_list : expression terminator
+                   | RETRY terminator
+                   | BREAK terminator
+                   | if_expression_list expression terminator
+                   | if_expression_list RETRY terminator
+                   | if_expression_list BREAK terminator
+                   ;
 
 unless_statement : UNLESS comparison_list crlf unless_expression_list END;
 
@@ -85,7 +87,7 @@ for_statement : FOR LEFT_RBRACKET init_expression SEMICOLON cond_expression SEMI
               | FOR init_expression SEMICOLON cond_expression SEMICOLON loop_expression crlf for_expression_list END
               ;
 
-init_expression : expression;
+init_expression : ( int_assignment | float_assignment | string_assignment | dynamic_assignment );
 
 cond_expression : comparison_list;
 
@@ -189,8 +191,8 @@ comparison_list : comparison BIT_AND comparison_list
                 | comparison
                 ;
 
-comparison : rvalue ( LESS | GREATER | LESS_EQUAL | GREATER_EQUAL ) rvalue
-           | rvalue ( EQUAL | NOT_EQUAL ) rvalue
+comparison : left=rvalue ( LESS | GREATER | LESS_EQUAL | GREATER_EQUAL ) right=rvalue
+           | left=rvalue ( EQUAL | NOT_EQUAL ) right=rvalue
            ;
 
 lvalue : id  
@@ -265,6 +267,8 @@ terminator : terminator SEMICOLON
            | crlf
            ;
 
+else_token : ELSE;
+
 crlf : CRLF;
 
 fragment ESCAPED_QUOTE : '\\"';
@@ -281,7 +285,6 @@ DEF : 'def';
 RETURN : 'return';
 
 IF: 'if';
-THEN : 'then';
 ELSE : 'else';
 ELSIF : 'elsif';
 UNLESS : 'unless';
