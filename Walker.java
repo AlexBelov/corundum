@@ -19,6 +19,10 @@ public class Walker {
         ParseTreeProperty<String> which_value = new ParseTreeProperty<String>();
 
         Stack<Integer> stack_labels = new Stack<Integer>();
+        Stack<ByteArrayOutputStream> stack_output_streams = new Stack<ByteArrayOutputStream>();
+
+        ByteArrayOutputStream temp_stream = new ByteArrayOutputStream();
+        ByteArrayOutputStream func_stream = new ByteArrayOutputStream();
 
         public int SemanticErrorsNum = 0;
         public int NumStr = 1;
@@ -457,10 +461,15 @@ public class Walker {
         // ======================================== FOR loop ========================================
 
         public void enterFor_statement(CorundumParser.For_statementContext ctx) {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            stack_output_streams.push(temp_stream);
+            ByteArrayOutputStream out = stack_output_streams.pop();
             PrintStream pr = new PrintStream(out);
             pr.println("fffuck!");
             pr.println("fffuuuuuck!");
+            stack_output_streams.push(out);
+            System.out.println(out.toString());
+            out.reset();
+            System.out.println("!!!!!!!!!!!!!!!!");
             System.out.println(out.toString());
 
             if (ctx.getChildCount() == 11) {
