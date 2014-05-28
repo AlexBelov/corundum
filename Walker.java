@@ -6,7 +6,10 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.io.PrintStream;
+import java.io.ByteArrayOutputStream;
 import java.util.Stack;
+import java.util.LinkedList;
 
 public class Walker {
     public static class Evaluator extends CorundumBaseListener {
@@ -21,7 +24,7 @@ public class Walker {
         public int NumStr = 1;
         public int Num_reg = 0;
         public int Num_label = 0;
-        java.util.LinkedList<String> definitions = new java.util.LinkedList<String>();
+        LinkedList<String> definitions = new LinkedList<String>();
 
         public static boolean is_defined(java.util.LinkedList<String> definitions, String variable) {
             int index = definitions.indexOf(variable);
@@ -454,7 +457,40 @@ public class Walker {
         // ======================================== FOR loop ========================================
 
         public void enterFor_statement(CorundumParser.For_statementContext ctx) {
-            System.out.println("FOR");
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            PrintStream pr = new PrintStream(out);
+            pr.println("fffuck!");
+            pr.println("fffuuuuuck!");
+            System.out.println(out.toString());
+
+            if (ctx.getChildCount() == 11) {
+                String var = string_values.get(ctx.getChild(2));
+                String cond = ctx.getChild(4).getText();
+                if (!is_defined(definitions, var)) {
+                    System.out.println(".local pmc " + var);
+                    System.out.println(var + " = new \"Integer\"");
+                    definitions.add(var);
+                }
+                Num_label++;
+                System.out.println("label_" + Num_label + ":");
+                Num_label++;
+                stack_labels.push(Num_label);
+                stack_labels.push(Num_label - 1);
+                System.out.println("unless " + cond + " goto label_" + Num_label);
+            }
+        }
+
+        public void exitFor_statement(CorundumParser.For_statementContext ctx) {
+            if (ctx.getChildCount() == 11) {
+                String loop_expr = ctx.getChild(6).getText();
+                System.out.println(loop_expr);
+                System.out.println("label_" + stack_labels.pop() + ":");
+                
+            }
+        }
+
+        public void exitLoop_expression(CorundumParser.Loop_expressionContext ctx) {
+            string_values.put(ctx, ctx.var_id.getText());
         }
 
         // ======================================== Terminal node ========================================
@@ -482,7 +518,6 @@ public class Walker {
                     str_terminal = String.valueOf(symbol.getText());
                     string_values.put(node, str_terminal);
                     which_value.put(node, "Dynamic");
-                    //System.out.println(str_terminal);
                     break;
             }
         }

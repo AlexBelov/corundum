@@ -28,9 +28,9 @@ else
 	a = 3
 end
 
-# for(i = 0; i<10; i+=1)
-# 	a = 1
-# 	if a == 1
-# 		break
-# 	end
-# end
+for(i = 0; i<10; i+=1)
+	a = 1
+	if a == 1
+		break
+	end
+end

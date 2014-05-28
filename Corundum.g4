@@ -88,11 +88,11 @@ for_statement : FOR LEFT_RBRACKET init_expression SEMICOLON cond_expression SEMI
               | FOR init_expression SEMICOLON cond_expression SEMICOLON loop_expression crlf for_expression_list END
               ;
 
-init_expression : ( int_assignment | float_assignment | string_assignment | dynamic_assignment );
+init_expression : var_id=lvalue op=ASSIGN ( int_result | float_result | string_result | dynamic_result ) ;
 
 cond_expression : comparison_list;
 
-loop_expression : expression;
+loop_expression : var_id=lvalue op=( ASSIGN | PLUS_ASSIGN | MINUS_ASSIGN | MUL_ASSIGN | DIV_ASSIGN | MOD_ASSIGN | EXP_ASSIGN ) ( int_result | float_result | string_result | dynamic_result ) ;
 
 for_expression_list : expression terminator
                     | RETRY terminator
