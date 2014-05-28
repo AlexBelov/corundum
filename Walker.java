@@ -380,6 +380,27 @@ public class Walker {
             which_value.put(ctx, which_value.get(ctx.getChild(0)));
         }
 
+        // ======================================== Array definition ========================================
+
+        public void enterInitial_array_assignment(CorundumParser.Initial_array_assignmentContext ctx) {
+            String var = ctx.var_id.getText();
+
+            if (!is_defined(definitions, var)) {
+                System.out.println(var + " = new \"ResizablePMCArray\"");
+                definitions.add(var);
+            }
+        }
+
+        public void exitArray_assignment(CorundumParser.Array_assignmentContext ctx) {
+            System.out.println(ctx.getText());
+        }
+
+        public void exitArray_selector(CorundumParser.Array_selectorContext ctx) {
+            String var_selector = ctx.getText();
+            string_values.put(ctx, var_selector);
+            which_value.put(ctx, "Dynamic");
+        }
+
         // ======================================== Terminal node ========================================
 
         public void visitTerminal(TerminalNode node) {

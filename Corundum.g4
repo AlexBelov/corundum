@@ -1,19 +1,5 @@
 grammar Corundum;
 
-@members {
-  public int SemanticErrorsNum = 0;
-  public int NumStr = 1;
-  java.util.LinkedList<String> definitions = new java.util.LinkedList<String>();
-
-  public static boolean is_defined(java.util.LinkedList<String> definitions, String variable) {
-       int index = definitions.indexOf(variable);
-       if (index == -1) {
-         return false;
-       }
-       return true;
-  }
-}
-
 prog : expression_list;
 
 expression_list : expression terminator
@@ -113,8 +99,8 @@ for_expression_list : expression terminator
                     | for_expression_list BREAK terminator
                     ;
 
-assignment : lvalue op=ASSIGN rvalue
-           | lvalue op=( PLUS_ASSIGN | MINUS_ASSIGN | MUL_ASSIGN | DIV_ASSIGN | MOD_ASSIGN | EXP_ASSIGN ) rvalue
+assignment : var_id=lvalue op=ASSIGN rvalue
+           | var_id=lvalue op=( PLUS_ASSIGN | MINUS_ASSIGN | MUL_ASSIGN | DIV_ASSIGN | MOD_ASSIGN | EXP_ASSIGN ) rvalue
            ;
 
 dynamic_assignment : var_id=lvalue op=ASSIGN dynamic_result
@@ -133,21 +119,22 @@ string_assignment : var_id=lvalue op=ASSIGN string_result
                   | var_id=lvalue op=PLUS_ASSIGN string_result
                   ;
 
-array_assignment : lvalue array_definition ASSIGN rvalue
-                 | lvalue ASSIGN array_definition
-                 ;
+initial_array_assignment : var_id=lvalue op=ASSIGN LEFT_SBRACKET RIGHT_SBRACKET;
 
-array_definition : LEFT_SBRACKET array_definition_elements RIGHT_SBRACKET
-                 | LEFT_SBRACKET RIGHT_SBRACKET
-                 ;
+array_assignment : var_id=lvalue array_definition op=ASSIGN array_value;
 
-array_definition_elements : rvalue
-                          | array_definition_elements COMMA rvalue
+array_definition : LEFT_SBRACKET array_definition_elements RIGHT_SBRACKET;
+
+array_definition_elements : int_t
+                          | array_definition_elements COMMA int_t
                           ;
 
-array_selector : id LEFT_SBRACKET rvalue RIGHT_SBRACKET
-               | id_global LEFT_SBRACKET rvalue RIGHT_SBRACKET
-               | function_call LEFT_SBRACKET rvalue RIGHT_SBRACKET
+array_value : ( int_t | float_t | literal_t )
+            | dynamic
+            ;
+
+array_selector : id LEFT_SBRACKET int_t RIGHT_SBRACKET
+               | id_global LEFT_SBRACKET int_t RIGHT_SBRACKET
                ;
 
 dynamic_result : dynamic_result op=( MUL | DIV | MOD ) int_result
@@ -169,6 +156,7 @@ dynamic_result : dynamic_result op=( MUL | DIV | MOD ) int_result
 dynamic : id
         | id_global
         | function_call
+        | array_selector
         ;
 
 int_result : int_result op=( MUL | DIV | MOD ) int_result
@@ -210,7 +198,8 @@ lvalue : id
        ;
 
 rvalue : lvalue 
-
+        
+       | initial_array_assignment
        | array_assignment
 
        | int_result
