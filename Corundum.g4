@@ -51,14 +51,14 @@ function_call_params : rvalue
                      | function_call_params COMMA rvalue
                      ;
 
-if_elsif_statement : ELSIF comparison_list crlf if_expression_list
-                   | ELSIF comparison_list crlf if_expression_list else_token crlf if_expression_list
-                   | ELSIF comparison_list crlf if_expression_list if_elsif_statement
+if_elsif_statement : ELSIF cond_expression crlf if_expression_list
+                   | ELSIF cond_expression crlf if_expression_list else_token crlf if_expression_list
+                   | ELSIF cond_expression crlf if_expression_list if_elsif_statement
                    ;
 
-if_statement : IF comparison_list crlf if_expression_list END
-             | IF comparison_list crlf if_expression_list else_token crlf if_expression_list END
-             | IF comparison_list crlf if_expression_list if_elsif_statement END
+if_statement : IF cond_expression crlf if_expression_list END
+             | IF cond_expression crlf if_expression_list else_token crlf if_expression_list END
+             | IF cond_expression crlf if_expression_list if_elsif_statement END
              ;
 
 if_expression_list : expression terminator
@@ -69,12 +69,12 @@ if_expression_list : expression terminator
                    | if_expression_list BREAK terminator
                    ;
 
-unless_statement : UNLESS comparison_list crlf if_expression_list END
-                 | UNLESS comparison_list crlf if_expression_list else_token crlf if_expression_list END
-                 | UNLESS comparison_list crlf if_expression_list if_elsif_statement END
+unless_statement : UNLESS cond_expression crlf if_expression_list END
+                 | UNLESS cond_expression crlf if_expression_list else_token crlf if_expression_list END
+                 | UNLESS cond_expression crlf if_expression_list if_elsif_statement END
                  ;
 
-while_statement : WHILE comparison_list crlf while_expression_list END;
+while_statement : WHILE cond_expression crlf while_expression_list END;
 
 while_expression_list : expression terminator
                       | RETRY terminator
@@ -84,15 +84,17 @@ while_expression_list : expression terminator
                       | while_expression_list BREAK terminator
                       ;
 
-for_statement : FOR LEFT_RBRACKET init_expression SEMICOLON cond_expression SEMICOLON loop_expression RIGHT_RBRACKET crlf for_expression_list END
-              | FOR init_expression SEMICOLON cond_expression SEMICOLON loop_expression crlf for_expression_list END
+for_statement : FOR LEFT_RBRACKET init_expression SEMICOLON cond_expression SEMICOLON loop_expression RIGHT_RBRACKET crlf for_statement_body END
+              | FOR init_expression SEMICOLON cond_expression SEMICOLON loop_expression crlf for_statement_body END
               ;
 
-init_expression : var_id=lvalue op=ASSIGN ( int_result | float_result | string_result | dynamic_result ) ;
+init_expression : ( int_assignment | float_assignment | string_assignment | dynamic_assignment );
 
 cond_expression : comparison_list;
 
-loop_expression : var_id=lvalue op=( ASSIGN | PLUS_ASSIGN | MINUS_ASSIGN | MUL_ASSIGN | DIV_ASSIGN | MOD_ASSIGN | EXP_ASSIGN ) ( int_result | float_result | string_result | dynamic_result ) ;
+loop_expression : ( int_assignment | float_assignment | string_assignment | dynamic_assignment );
+
+for_statement_body : for_expression_list;
 
 for_expression_list : expression terminator
                     | RETRY terminator
@@ -184,16 +186,16 @@ string_result : string_result op=MUL int_result
               | literal_t
               ;
 
-comparison_list : comparison BIT_AND comparison_list
-                | comparison AND comparison_list
-                | comparison BIT_OR comparison_list
-                | comparison OR comparison_list
+comparison_list : left=comparison op=BIT_AND right=comparison_list
+                | left=comparison op=AND right=comparison_list
+                | left=comparison op=BIT_OR right=comparison_list
+                | left=comparison op=OR right=comparison_list
                 | LEFT_RBRACKET comparison_list RIGHT_RBRACKET
                 | comparison
                 ;
 
-comparison : left=rvalue ( LESS | GREATER | LESS_EQUAL | GREATER_EQUAL ) right=rvalue
-           | left=rvalue ( EQUAL | NOT_EQUAL ) right=rvalue
+comparison : left=rvalue op=( LESS | GREATER | LESS_EQUAL | GREATER_EQUAL ) right=rvalue
+           | left=rvalue op=( EQUAL | NOT_EQUAL ) right=rvalue
            ;
 
 lvalue : id  

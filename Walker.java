@@ -21,12 +21,17 @@ public class Walker {
         Stack<Integer> stack_labels = new Stack<Integer>();
         Stack<ByteArrayOutputStream> stack_output_streams = new Stack<ByteArrayOutputStream>();
 
-        ByteArrayOutputStream temp_stream = new ByteArrayOutputStream();
+        ByteArrayOutputStream main_stream = new ByteArrayOutputStream();
         ByteArrayOutputStream func_stream = new ByteArrayOutputStream();
+        ByteArrayOutputStream temp_1_stream = new ByteArrayOutputStream();
+        ByteArrayOutputStream temp_2_stream = new ByteArrayOutputStream();
+        ByteArrayOutputStream temp_3_stream = new ByteArrayOutputStream();
+        ByteArrayOutputStream temp_4_stream = new ByteArrayOutputStream();
 
         public int SemanticErrorsNum = 0;
         public int NumStr = 1;
         public int Num_reg = 0;
+        public int Num_reg_int = 0;
         public int Num_label = 0;
         LinkedList<String> definitions = new LinkedList<String>();
 
@@ -46,13 +51,15 @@ public class Walker {
         // ======================================== Integer ========================================
 
         public void enterInt_assignment(CorundumParser.Int_assignmentContext ctx) {
+            ByteArrayOutputStream out = stack_output_streams.pop();
+            PrintStream ps = new PrintStream(out);
+
             switch(ctx.op.getType()) {
                 case CorundumParser.ASSIGN:
                     String var = ctx.var_id.getText();
                     if (!is_defined(definitions, var)) {
-                        System.out.println(".local pmc " + ctx.var_id.getText());
-                        System.out.println(ctx.var_id.getText() + " = new \"Integer\"");
-                        definitions.add(ctx.var_id.getText());
+                        ps.println(".local int " + ctx.var_id.getText());
+                        definitions.add(ctx.var_id.getText());                        
                     }
                     break;
                 default:
@@ -63,11 +70,18 @@ public class Walker {
                     }
                     break;
             }
+
+            stack_output_streams.push(out); 
         }
 
         public void exitInt_assignment(CorundumParser.Int_assignmentContext ctx) {
+            ByteArrayOutputStream out = stack_output_streams.pop();
+            PrintStream ps = new PrintStream(out);
+
             String str = ctx.var_id.getText() + " " + ctx.op.getText() + " " + int_values.get(ctx.getChild(2));
-            System.out.println(str);
+            ps.println(str);
+
+            stack_output_streams.push(out);
         }
 
         public void exitInt_result(CorundumParser.Int_resultContext ctx) {
@@ -117,12 +131,14 @@ public class Walker {
         // ======================================== Float ========================================
 
         public void enterFloat_assignment(CorundumParser.Float_assignmentContext ctx) {
+            ByteArrayOutputStream out = stack_output_streams.pop();
+            PrintStream ps = new PrintStream(out);
+
             switch(ctx.op.getType()) {
                 case CorundumParser.ASSIGN:
                     String var = ctx.var_id.getText();
                     if (!is_defined(definitions, var)) {
-                        System.out.println(".local pmc " + ctx.var_id.getText());
-                        System.out.println(ctx.var_id.getText() + " = new \"Float\"");
+                        ps.println(".local num " + ctx.var_id.getText());
                         definitions.add(ctx.var_id.getText());
                     }
                     break;
@@ -134,11 +150,18 @@ public class Walker {
                     }
                     break;
             }
+
+            stack_output_streams.push(out);
         }
 
         public void exitFloat_assignment(CorundumParser.Float_assignmentContext ctx) {
+            ByteArrayOutputStream out = stack_output_streams.pop();
+            PrintStream ps = new PrintStream(out);
+
             String str = ctx.var_id.getText() + " " + ctx.op.getText() + " " + float_values.get(ctx.getChild(2));
-            System.out.println(str);
+            ps.println(str);
+
+            stack_output_streams.push(out);
         }
 
         public void exitFloat_result(CorundumParser.Float_resultContext ctx) {
@@ -206,12 +229,14 @@ public class Walker {
         // ======================================== String ========================================
 
         public void enterString_assignment(CorundumParser.String_assignmentContext ctx) {
+            ByteArrayOutputStream out = stack_output_streams.pop();
+            PrintStream ps = new PrintStream(out);
+
             switch(ctx.op.getType()) {
                 case CorundumParser.ASSIGN:
                     String var = ctx.var_id.getText();
                     if (!is_defined(definitions, var)) {
-                        System.out.println(".local pmc " + ctx.var_id.getText());
-                        System.out.println(ctx.var_id.getText() + " = new \"String\"");
+                        ps.println(".local string " + ctx.var_id.getText());
                         definitions.add(ctx.var_id.getText());
                     }
                     break;
@@ -223,11 +248,18 @@ public class Walker {
                     }
                     break;
             }
+
+            stack_output_streams.push(out);
         }
 
         public void exitString_assignment(CorundumParser.String_assignmentContext ctx) {
+            ByteArrayOutputStream out = stack_output_streams.pop();
+            PrintStream ps = new PrintStream(out);
+
             String str = ctx.var_id.getText() + " " + ctx.op.getText() + " \"" + string_values.get(ctx.getChild(2)) + "\"";
-            System.out.println(str);
+            ps.println(str);
+
+            stack_output_streams.push(out);
         }
 
         public void exitString_result(CorundumParser.String_resultContext ctx) {
@@ -287,12 +319,15 @@ public class Walker {
         // ======================================== Dynamic assignment ========================================
 
         public void enterDynamic_assignment(CorundumParser.Dynamic_assignmentContext ctx) {
+            ByteArrayOutputStream out = stack_output_streams.pop();
+            PrintStream ps = new PrintStream(out);
+
             switch(ctx.op.getType()) {
                 case CorundumParser.ASSIGN:
                     String var = ctx.var_id.getText();
                     if (!is_defined(definitions, var)) {
-                        System.out.println(".local pmc " + ctx.var_id.getText());
-                        System.out.println(ctx.var_id.getText() + " = new \"Integer\"");
+                        ps.println(".local pmc " + ctx.var_id.getText());
+                        ps.println(ctx.var_id.getText() + " = new \"Integer\"");
                         definitions.add(ctx.var_id.getText());
                         Num_reg = 0;
                     }
@@ -305,15 +340,25 @@ public class Walker {
                     }
                     break;
             }
+
+            stack_output_streams.push(out);
         }
 
         public void exitDynamic_assignment(CorundumParser.Dynamic_assignmentContext ctx) {
+            ByteArrayOutputStream out = stack_output_streams.pop();
+            PrintStream ps = new PrintStream(out);
+
             String str = ctx.var_id.getText() + " " + ctx.op.getText() + " " + string_values.get(ctx.getChild(2));
             Num_reg = 0;
-            System.out.println(str);
+            ps.println(str);
+
+            stack_output_streams.push(out);
         }
 
         public void exitDynamic_result(CorundumParser.Dynamic_resultContext ctx) {
+            ByteArrayOutputStream out = stack_output_streams.pop();
+            PrintStream ps = new PrintStream(out);
+
             if ( ctx.getChildCount() == 3 && ctx.op != null ) { // operation node
 
                 int int_dyn = 0;
@@ -362,12 +407,11 @@ public class Walker {
                         break;
                 }
 
-                System.out.println("$P" + Num_reg + " = new \"Integer\"");
-                System.out.println(str_output);
+                ps.println("$P" + Num_reg + " = new \"Integer\"");
+                ps.println(str_output);
                 string_values.put(ctx, "$P" + Num_reg);
                 which_value.put(ctx, "Dynamic");
                 Num_reg++;
-                
             }
             else if ( ctx.getChildCount() == 1 ) { // near-terminal node
                 string_values.put(ctx, string_values.get(ctx.getChild(0)));
@@ -377,15 +421,22 @@ public class Walker {
                 string_values.put(ctx, string_values.get(ctx.getChild(1)));
                 which_value.put(ctx, "Dynamic");
             }
+
+            stack_output_streams.push(out);
         }
 
         public void exitDynamic(CorundumParser.DynamicContext ctx) {
+            ByteArrayOutputStream out = stack_output_streams.pop();
+            PrintStream ps = new PrintStream(out);
+
             String str_dyn_term = string_values.get(ctx.getChild(0));
-            System.out.println("$P" + Num_reg + " = new \"Integer\"");
-            System.out.println("$P" + Num_reg + " = " + str_dyn_term);
+            ps.println("$P" + Num_reg + " = new \"Integer\"");
+            ps.println("$P" + Num_reg + " = " + str_dyn_term);
             string_values.put(ctx, "$P" + Num_reg);
             Num_reg++;
             which_value.put(ctx, which_value.get(ctx.getChild(0)));
+
+            stack_output_streams.push(out);
         }
 
         public void exitId(CorundumParser.IdContext ctx) {
@@ -396,22 +447,33 @@ public class Walker {
         // ======================================== Array definition ========================================
 
         public void enterInitial_array_assignment(CorundumParser.Initial_array_assignmentContext ctx) {
+            ByteArrayOutputStream out = stack_output_streams.pop();
+            PrintStream ps = new PrintStream(out);
+
             String var = ctx.var_id.getText();
 
             if (!is_defined(definitions, var)) {
-                System.out.println(var + " = new \"ResizablePMCArray\"");
+                ps.println(var + " = new \"ResizablePMCArray\"");
                 definitions.add(var);
             }
+
+            stack_output_streams.push(out);
         }
 
         public void exitArray_assignment(CorundumParser.Array_assignmentContext ctx) {
+            ByteArrayOutputStream out = stack_output_streams.pop();
+            PrintStream ps = new PrintStream(out);
+
             String var = ctx.var_id.getText();
 
-            System.out.println(var + ctx.arr_def.getText() + " = " + ctx.arr_val.getText());
+            ps.println(var + ctx.arr_def.getText() + " = " + ctx.arr_val.getText());
+
             if (!is_defined(definitions, var)) {
                 System.out.println("line " + NumStr + " Error! Undefined variable " + var + "!");
                 SemanticErrorsNum++;
             }
+
+            stack_output_streams.push(out);
         }
 
         public void exitArray_selector(CorundumParser.Array_selectorContext ctx) {
@@ -423,83 +485,192 @@ public class Walker {
         // ======================================== IF statement ========================================
 
         public void enterIf_statement(CorundumParser.If_statementContext ctx) {
+            //ByteArrayOutputStream temp1 = stack_output_streams.pop();
+            ByteArrayOutputStream out = stack_output_streams.pop();
+            PrintStream ps = new PrintStream(out);
+
             Num_label++;
-            System.out.println("if " + ctx.getChild(1).getText() + " goto label_" + Num_label);
+            //ps.println(temp1.toString());
+            ps.println("if " + ctx.getChild(1).getText() + " goto label_" + Num_label);
             Num_label++;
-            System.out.println("goto label_" + Num_label + ":");
-            System.out.println("label_" + (Num_label - 1) + ":");
+            ps.println("goto label_" + Num_label + ":");
+            ps.println("label_" + (Num_label - 1) + ":");
             stack_labels.push(Num_label);
+
+            stack_output_streams.push(out);
         }
 
-        public void exitIf_statement(CorundumParser.If_statementContext ctx) {      
+        public void exitIf_statement(CorundumParser.If_statementContext ctx) {
+            ByteArrayOutputStream out = stack_output_streams.pop();
+            PrintStream ps = new PrintStream(out);
+
             if (!ctx.getChild(4).getText().contains("else")) {
-                System.out.println("label_" + stack_labels.pop() + ":");
+                ps.println("label_" + stack_labels.pop() + ":");
             }
+
+            stack_output_streams.push(out);
         }
 
         public void exitElse_token(CorundumParser.Else_tokenContext ctx) {
-            System.out.println("label_" + stack_labels.pop() + ":");
+            ByteArrayOutputStream out = stack_output_streams.pop();
+            PrintStream ps = new PrintStream(out);
+
+            ps.println("label_" + stack_labels.pop() + ":");
+
+            stack_output_streams.push(out);
         }
 
         // ======================================== UNLESS statement ========================================
 
         public void enterUnless_statement(CorundumParser.Unless_statementContext ctx) {
+            //ByteArrayOutputStream temp1 = stack_output_streams.pop();
+            ByteArrayOutputStream out = stack_output_streams.pop();
+            PrintStream ps = new PrintStream(out);
+
             Num_label++;
-            System.out.println("unless " + ctx.getChild(1).getText() + " goto label_" + Num_label);
+            //ps.println(temp1.toString());
+            ps.println("unless " + ctx.getChild(1).getText() + " goto label_" + Num_label);
             Num_label++;
-            System.out.println("goto label_" + Num_label + ":");
-            System.out.println("label_" + (Num_label - 1) + ":");
+            ps.println("goto label_" + Num_label + ":");
+            ps.println("label_" + (Num_label - 1) + ":");
             stack_labels.push(Num_label);
+
+            stack_output_streams.push(out);
         }
 
-        public void exitUnless_statement(CorundumParser.Unless_statementContext ctx) {      
+        public void exitUnless_statement(CorundumParser.Unless_statementContext ctx) {    
+            ByteArrayOutputStream out = stack_output_streams.pop();
+            PrintStream ps = new PrintStream(out);
+
             if (!ctx.getChild(4).getText().contains("else")) {
-                System.out.println("label_" + stack_labels.pop() + ":");
+                ps.println("label_" + stack_labels.pop() + ":");
             }
+
+            stack_output_streams.push(out);
         }
 
         // ======================================== FOR loop ========================================
 
-        public void enterFor_statement(CorundumParser.For_statementContext ctx) {
-            stack_output_streams.push(temp_stream);
+        public void exitFor_statement(CorundumParser.For_statementContext ctx) {
+            ByteArrayOutputStream temp4 = stack_output_streams.pop();
+            ByteArrayOutputStream temp3 = stack_output_streams.pop();
+            ByteArrayOutputStream temp2 = stack_output_streams.pop();
+            ByteArrayOutputStream temp1 = stack_output_streams.pop();
             ByteArrayOutputStream out = stack_output_streams.pop();
-            PrintStream pr = new PrintStream(out);
-            pr.println("fffuck!");
-            pr.println("fffuuuuuck!");
-            stack_output_streams.push(out);
-            System.out.println(out.toString());
-            out.reset();
-            System.out.println("!!!!!!!!!!!!!!!!");
-            System.out.println(out.toString());
+            PrintStream ps = new PrintStream(out);
 
             if (ctx.getChildCount() == 11) {
-                String var = string_values.get(ctx.getChild(2));
-                String cond = ctx.getChild(4).getText();
-                if (!is_defined(definitions, var)) {
-                    System.out.println(".local pmc " + var);
-                    System.out.println(var + " = new \"Integer\"");
-                    definitions.add(var);
-                }
+                ps.println(temp1.toString());
+                String cond = string_values.get(ctx.getChild(4));
                 Num_label++;
-                System.out.println("label_" + Num_label + ":");
+                ps.println("label_" + Num_label + ":");
                 Num_label++;
                 stack_labels.push(Num_label);
                 stack_labels.push(Num_label - 1);
-                System.out.println("unless " + cond + " goto label_" + Num_label);
+                ps.println(temp2.toString());
+                ps.println("unless " + cond + " goto label_" + Num_label);
+                ps.println(temp4.toString());
+                ps.println(temp3.toString());
+                ps.println("goto label_" + stack_labels.pop());
+                ps.println("label_" + stack_labels.pop() + ":");
             }
+
+            stack_output_streams.push(out);
+            temp1.reset();
+            temp2.reset();
+            temp3.reset();
         }
 
-        public void exitFor_statement(CorundumParser.For_statementContext ctx) {
-            if (ctx.getChildCount() == 11) {
-                String loop_expr = ctx.getChild(6).getText();
-                System.out.println(loop_expr);
-                System.out.println("label_" + stack_labels.pop() + ":");
-                
-            }
+        public void enterInit_expression(CorundumParser.Init_expressionContext ctx) {
+            temp_1_stream.reset();
+            stack_output_streams.push(temp_1_stream);
         }
 
-        public void exitLoop_expression(CorundumParser.Loop_expressionContext ctx) {
-            string_values.put(ctx, ctx.var_id.getText());
+        public void enterCond_expression(CorundumParser.Cond_expressionContext ctx) {
+            temp_2_stream.reset();
+            stack_output_streams.push(temp_2_stream);
+        }
+
+        public void exitCond_expression(CorundumParser.Cond_expressionContext ctx) {
+            string_values.put(ctx, string_values.get(ctx.getChild(0)));
+        }
+
+        public void enterLoop_expression(CorundumParser.Loop_expressionContext ctx) {
+            temp_3_stream.reset();
+            stack_output_streams.push(temp_3_stream);
+        }
+
+        public void enterFor_statement_body(CorundumParser.For_statement_bodyContext ctx) {
+            temp_4_stream.reset();
+            stack_output_streams.push(temp_4_stream);
+        }
+
+        public void exitComparison_list(CorundumParser.Comparison_listContext ctx) {
+            ByteArrayOutputStream out = stack_output_streams.pop();
+            PrintStream ps = new PrintStream(out);
+
+            if ( ctx.getChildCount() == 3 ) {
+                String left = string_values.get(ctx.getChild(0));
+                String right = string_values.get(ctx.getChild(2));     
+
+                switch(ctx.op.getType()) {
+                case CorundumParser.BIT_AND:
+                    ps.println("$I" + Num_reg_int + " = " + left + " && " + right);
+                    break;
+                case CorundumParser.AND:
+                    ps.println("$I" + Num_reg_int + " = " + left + " && " + right);
+                    break;
+                case CorundumParser.BIT_OR:
+                    ps.println("$I" + Num_reg_int + " = " + left + " || " + right);
+                    break;
+                case CorundumParser.OR:
+                    ps.println("$I" + Num_reg_int + " = " + left + " || " + right);
+                    break;
+                }
+
+                string_values.put(ctx, "$I" + Num_reg_int);
+                Num_reg_int++;
+            }
+            else if ( ctx.getChildCount() == 1 ) {
+                string_values.put(ctx, string_values.get(ctx.getChild(0)));
+            }
+
+            stack_output_streams.push(out);
+        }
+
+        public void exitComparison(CorundumParser.ComparisonContext ctx) {
+            ByteArrayOutputStream out = stack_output_streams.pop();
+            PrintStream ps = new PrintStream(out);
+
+            String left = ctx.left.getText();
+            String right = ctx.right.getText();
+
+            switch(ctx.op.getType()) {
+                case CorundumParser.LESS:
+                    ps.println("$I" + Num_reg_int + " = islt " + left + ", " + right);
+                    break;
+                case CorundumParser.GREATER:
+                    ps.println("$I" + Num_reg_int + " = isgt " + left + ", " + right);
+                    break;
+                case CorundumParser.LESS_EQUAL:
+                    ps.println("$I" + Num_reg_int + " = isle " + left + ", " + right);
+                    break;
+                case CorundumParser.GREATER_EQUAL:
+                    ps.println("$I" + Num_reg_int + " = isge " + left + ", " + right);
+                    break;
+                case CorundumParser.EQUAL:
+                    ps.println("$I" + Num_reg_int + " = iseq " + left + ", " + right);
+                    break;
+                case CorundumParser.NOT_EQUAL:
+                    String temp = "\n$I" + Num_reg_int + " = not " + "$I" + Num_reg_int;
+                    ps.println("$I" + Num_reg_int + " = iseq " + left + ", " + right + temp);
+                    
+                    break;
+            }
+            string_values.put(ctx, "$I" + Num_reg_int);
+            Num_reg_int++;
+
+            stack_output_streams.push(out);
         }
 
         // ======================================== Terminal node ========================================
@@ -557,6 +728,11 @@ public class Walker {
         ParseTreeWalker walker = new ParseTreeWalker();
 
         Evaluator eval = new Evaluator();
+        eval.stack_output_streams.push(eval.main_stream);
         walker.walk(eval, tree);
+
+        System.out.println("\n======================================================");
+        ByteArrayOutputStream out = eval.stack_output_streams.pop();
+        System.out.println(out.toString());
     }
 }
