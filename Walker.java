@@ -597,7 +597,7 @@ public class Walker {
             stack_output_streams.push(temp_3);
         }
 
-        public void enterFor_statement_body(CorundumParser.For_statement_bodyContext ctx) {
+        public void enterStatement_body(CorundumParser.Statement_bodyContext ctx) {
             ByteArrayOutputStream temp_4 = new ByteArrayOutputStream();
             stack_output_streams.push(temp_4);
         }

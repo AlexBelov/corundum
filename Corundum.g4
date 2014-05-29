@@ -51,25 +51,25 @@ function_call_params : rvalue
                      | function_call_params COMMA rvalue
                      ;
 
-//if_elsif_statement : ELSIF cond_expression crlf for_statement_body
-//                   | ELSIF cond_expression crlf for_statement_body else_token crlf for_statement_body
-//                   | ELSIF cond_expression crlf for_statement_body if_elsif_statement
+//if_elsif_statement : ELSIF cond_expression crlf statement_body
+//                   | ELSIF cond_expression crlf statement_body else_token crlf statement_body
+//                   | ELSIF cond_expression crlf statement_body if_elsif_statement
 //                   ;
 
-if_statement : IF cond_expression crlf for_statement_body END
-             | IF cond_expression crlf for_statement_body else_token crlf for_statement_body END
-             //| IF cond_expression crlf for_statement_body if_elsif_statement END
+if_statement : IF cond_expression crlf statement_body END
+             | IF cond_expression crlf statement_body else_token crlf statement_body END
+             //| IF cond_expression crlf statement_body if_elsif_statement END
              ;
 
-unless_statement : UNLESS cond_expression crlf for_statement_body END
-                 | UNLESS cond_expression crlf for_statement_body else_token crlf for_statement_body END
-                 //| UNLESS cond_expression crlf for_statement_body if_elsif_statement END
+unless_statement : UNLESS cond_expression crlf statement_body END
+                 | UNLESS cond_expression crlf statement_body else_token crlf statement_body END
+                 //| UNLESS cond_expression crlf statement_body if_elsif_statement END
                  ;
 
-while_statement : WHILE cond_expression crlf for_statement_body END;
+while_statement : WHILE cond_expression crlf statement_body END;
 
-for_statement : FOR LEFT_RBRACKET init_expression SEMICOLON cond_expression SEMICOLON loop_expression RIGHT_RBRACKET crlf for_statement_body END
-              | FOR init_expression SEMICOLON cond_expression SEMICOLON loop_expression crlf for_statement_body END
+for_statement : FOR LEFT_RBRACKET init_expression SEMICOLON cond_expression SEMICOLON loop_expression RIGHT_RBRACKET crlf statement_body END
+              | FOR init_expression SEMICOLON cond_expression SEMICOLON loop_expression crlf statement_body END
               ;
 
 init_expression : for_init_list;
@@ -88,15 +88,15 @@ for_loop_list : for_loop_list COMMA all_assignment
               | all_assignment
               ;
 
-for_statement_body : for_expression_list;
+statement_body : statement_expression_list;
 
-for_expression_list : expression terminator
-                    | RETRY terminator
-                    | BREAK terminator
-                    | for_expression_list expression terminator
-                    | for_expression_list RETRY terminator
-                    | for_expression_list BREAK terminator
-                    ;
+statement_expression_list : expression terminator
+                          | RETRY terminator
+                          | BREAK terminator
+                          | statement_expression_list expression terminator
+                          | statement_expression_list RETRY terminator
+                          | statement_expression_list BREAK terminator
+                          ;
 
 assignment : var_id=lvalue op=ASSIGN rvalue
            | var_id=lvalue op=( PLUS_ASSIGN | MINUS_ASSIGN | MUL_ASSIGN | DIV_ASSIGN | MOD_ASSIGN | EXP_ASSIGN ) rvalue
