@@ -66,15 +66,7 @@ unless_statement : UNLESS cond_expression crlf for_statement_body END
                  //| UNLESS cond_expression crlf for_statement_body if_elsif_statement END
                  ;
 
-while_statement : WHILE cond_expression crlf while_expression_list END;
-
-while_expression_list : expression terminator
-                      | RETRY terminator
-                      | BREAK terminator
-                      | while_expression_list expression terminator
-                      | while_expression_list RETRY terminator
-                      | while_expression_list BREAK terminator
-                      ;
+while_statement : WHILE cond_expression crlf for_statement_body END;
 
 for_statement : FOR LEFT_RBRACKET init_expression SEMICOLON cond_expression SEMICOLON loop_expression RIGHT_RBRACKET crlf for_statement_body END
               | FOR init_expression SEMICOLON cond_expression SEMICOLON loop_expression crlf for_statement_body END

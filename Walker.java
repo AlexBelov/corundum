@@ -668,6 +668,27 @@ public class Walker {
             stack_output_streams.push(out);
         }
 
+        // ======================================== WHILE loop ========================================
+
+        public void exitWhile_statement(CorundumParser.While_statementContext ctx) {
+            ByteArrayOutputStream body = stack_output_streams.pop();
+            ByteArrayOutputStream cond = stack_output_streams.pop();
+            ByteArrayOutputStream out = stack_output_streams.pop();
+            PrintStream ps = new PrintStream(out);
+
+            String condition_var = string_values.get(ctx.getChild(1));
+            Num_label++;
+            ps.println("label_" + Num_label + ":");
+            Num_label++;
+            ps.println(cond.toString());
+            ps.println("unless " + condition_var + " goto label_" + Num_label);
+            ps.println(body.toString());
+            ps.println("goto label_" + (Num_label - 1));
+            ps.println("label_" + Num_label + ":");
+
+            stack_output_streams.push(out);
+        }
+
         // ======================================== Terminal node ========================================
 
         public void visitTerminal(TerminalNode node) {
