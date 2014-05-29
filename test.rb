@@ -28,8 +28,8 @@
 # 	a = 3
 # end
 #
-for(i = 0; i<10 && i<20; i+=1)
-	a = 1
+for(i = 0, a = 0; i<10 && a<20; i+=1, a+=1)
+	a += 1
 	# if a == 1
 	# 	break
 	# end

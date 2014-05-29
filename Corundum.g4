@@ -88,11 +88,21 @@ for_statement : FOR LEFT_RBRACKET init_expression SEMICOLON cond_expression SEMI
               | FOR init_expression SEMICOLON cond_expression SEMICOLON loop_expression crlf for_statement_body END
               ;
 
-init_expression : ( int_assignment | float_assignment | string_assignment | dynamic_assignment );
+init_expression : for_init_list;
+
+all_assignment : ( int_assignment | float_assignment | string_assignment | dynamic_assignment );
+
+for_init_list : for_init_list COMMA all_assignment
+                | all_assignment
+                ;
 
 cond_expression : comparison_list;
 
-loop_expression : ( int_assignment | float_assignment | string_assignment | dynamic_assignment );
+loop_expression : for_loop_list;
+
+for_loop_list : for_loop_list COMMA all_assignment
+              | all_assignment
+              ;
 
 for_statement_body : for_expression_list;
 
