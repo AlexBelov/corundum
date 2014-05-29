@@ -22,6 +22,8 @@ public class Walker {
 
         ByteArrayOutputStream main_stream = new ByteArrayOutputStream();
         ByteArrayOutputStream func_stream = new ByteArrayOutputStream();
+        ByteArrayOutputStream error_stream = new ByteArrayOutputStream();
+        PrintStream ps_error = new PrintStream(error_stream);
 
         public int SemanticErrorsNum = 0;
         public int NumStr = 1;
@@ -60,7 +62,7 @@ public class Walker {
                 default:
                     var = ctx.var_id.getText();
                     if (!is_defined(definitions, var)) {
-                        System.out.println("line " + NumStr + " Error! Undefined variable " + var + "!");
+                        ps_error.println("line " + NumStr + " Error! Undefined variable " + var + "!");
                         SemanticErrorsNum++;
                     }
                     break;
@@ -140,7 +142,7 @@ public class Walker {
                 default:
                     var = ctx.var_id.getText();
                     if (!is_defined(definitions, var)) {
-                        System.out.println("line " + NumStr + " Error! Undefined variable " + var + "!");
+                        ps_error.println("line " + NumStr + " Error! Undefined variable " + var + "!");
                         SemanticErrorsNum++;
                     }
                     break;
@@ -238,7 +240,7 @@ public class Walker {
                 default:
                     var = ctx.var_id.getText();
                     if (!is_defined(definitions, var)) {
-                        System.out.println("line " + NumStr + " Error! Undefined variable " + var + "!");
+                        ps_error.println("line " + NumStr + " Error! Undefined variable " + var + "!");
                         SemanticErrorsNum++;
                     }
                     break;
@@ -330,7 +332,7 @@ public class Walker {
                 default:
                     var = ctx.var_id.getText();
                     if (!is_defined(definitions, var)) {
-                        System.out.println("line " + NumStr + " Error! Undefined variable " + var + "!");
+                        ps_error.println("line " + NumStr + " Error! Undefined variable " + var + "!");
                         SemanticErrorsNum++;
                     }
                     break;
@@ -464,7 +466,7 @@ public class Walker {
             ps.println(var + ctx.arr_def.getText() + " = " + ctx.arr_val.getText());
 
             if (!is_defined(definitions, var)) {
-                System.out.println("line " + NumStr + " Error! Undefined variable " + var + "!");
+                ps_error.println("line " + NumStr + " Error! Undefined variable " + var + "!");
                 SemanticErrorsNum++;
             }
 
