@@ -18,15 +18,10 @@ public class Walker {
         ParseTreeProperty<String> string_values = new ParseTreeProperty<String>();
         ParseTreeProperty<String> which_value = new ParseTreeProperty<String>();
 
-        Stack<Integer> stack_labels = new Stack<Integer>();
         Stack<ByteArrayOutputStream> stack_output_streams = new Stack<ByteArrayOutputStream>();
 
         ByteArrayOutputStream main_stream = new ByteArrayOutputStream();
         ByteArrayOutputStream func_stream = new ByteArrayOutputStream();
-        ByteArrayOutputStream temp_1_stream = new ByteArrayOutputStream();
-        ByteArrayOutputStream temp_2_stream = new ByteArrayOutputStream();
-        ByteArrayOutputStream temp_3_stream = new ByteArrayOutputStream();
-        ByteArrayOutputStream temp_4_stream = new ByteArrayOutputStream();
 
         public int SemanticErrorsNum = 0;
         public int NumStr = 1;
@@ -484,67 +479,72 @@ public class Walker {
 
         // ======================================== IF statement ========================================
 
-        public void enterIf_statement(CorundumParser.If_statementContext ctx) {
-            //ByteArrayOutputStream temp1 = stack_output_streams.pop();
+        public void exitIf_statement(CorundumParser.If_statementContext ctx) {
+            ByteArrayOutputStream else_body = new ByteArrayOutputStream();
+
+            if (ctx.getChild(4).getText().contains("else")) {
+                else_body = stack_output_streams.pop();     
+            }
+
+            ByteArrayOutputStream body = stack_output_streams.pop();
+            ByteArrayOutputStream cond = stack_output_streams.pop();
             ByteArrayOutputStream out = stack_output_streams.pop();
             PrintStream ps = new PrintStream(out);
+            String condition_var = string_values.get(ctx.getChild(1));
 
             Num_label++;
-            //ps.println(temp1.toString());
-            ps.println("if " + ctx.getChild(1).getText() + " goto label_" + Num_label);
+            ps.println(cond.toString());
+            ps.println("if " + condition_var + " goto label_" + Num_label);
             Num_label++;
             ps.println("goto label_" + Num_label + ":");
             ps.println("label_" + (Num_label - 1) + ":");
-            stack_labels.push(Num_label);
 
-            stack_output_streams.push(out);
-        }
+            ps.println(body.toString());
 
-        public void exitIf_statement(CorundumParser.If_statementContext ctx) {
-            ByteArrayOutputStream out = stack_output_streams.pop();
-            PrintStream ps = new PrintStream(out);
-
-            if (!ctx.getChild(4).getText().contains("else")) {
-                ps.println("label_" + stack_labels.pop() + ":");
+            if (ctx.getChild(4).getText().contains("else")) {
+                Num_label++;
+                ps.println("goto label_" + Num_label + ":");
+                ps.println("label_" + (Num_label - 1) + ":");              
+                ps.println(else_body.toString());     
             }
 
-            stack_output_streams.push(out);
-        }
-
-        public void exitElse_token(CorundumParser.Else_tokenContext ctx) {
-            ByteArrayOutputStream out = stack_output_streams.pop();
-            PrintStream ps = new PrintStream(out);
-
-            ps.println("label_" + stack_labels.pop() + ":");
+            ps.println("label_" + Num_label + ":");
 
             stack_output_streams.push(out);
         }
 
         // ======================================== UNLESS statement ========================================
 
-        public void enterUnless_statement(CorundumParser.Unless_statementContext ctx) {
-            //ByteArrayOutputStream temp1 = stack_output_streams.pop();
+        public void exitUnless_statement(CorundumParser.Unless_statementContext ctx) {
+            ByteArrayOutputStream else_body = new ByteArrayOutputStream();
+
+            if (ctx.getChild(4).getText().contains("else")) {
+                else_body = stack_output_streams.pop();     
+            }
+
+            ByteArrayOutputStream body = stack_output_streams.pop();
+            ByteArrayOutputStream cond = stack_output_streams.pop();
             ByteArrayOutputStream out = stack_output_streams.pop();
             PrintStream ps = new PrintStream(out);
+            String condition_var = string_values.get(ctx.getChild(1));
 
             Num_label++;
-            //ps.println(temp1.toString());
-            ps.println("unless " + ctx.getChild(1).getText() + " goto label_" + Num_label);
+            ps.println(cond.toString());
+            ps.println("unless " + condition_var + " goto label_" + Num_label);
             Num_label++;
             ps.println("goto label_" + Num_label + ":");
             ps.println("label_" + (Num_label - 1) + ":");
-            stack_labels.push(Num_label);
 
-            stack_output_streams.push(out);
-        }
+            ps.println(body.toString());
 
-        public void exitUnless_statement(CorundumParser.Unless_statementContext ctx) {    
-            ByteArrayOutputStream out = stack_output_streams.pop();
-            PrintStream ps = new PrintStream(out);
-
-            if (!ctx.getChild(4).getText().contains("else")) {
-                ps.println("label_" + stack_labels.pop() + ":");
+            if (ctx.getChild(4).getText().contains("else")) {
+                Num_label++;
+                ps.println("goto label_" + Num_label + ":");
+                ps.println("label_" + (Num_label - 1) + ":");              
+                ps.println(else_body.toString());     
             }
+
+            ps.println("label_" + Num_label + ":");
 
             stack_output_streams.push(out);
         }
@@ -565,30 +565,25 @@ public class Walker {
                 Num_label++;
                 ps.println("label_" + Num_label + ":");
                 Num_label++;
-                stack_labels.push(Num_label);
-                stack_labels.push(Num_label - 1);
                 ps.println(temp2.toString());
                 ps.println("unless " + cond + " goto label_" + Num_label);
                 ps.println(temp4.toString());
                 ps.println(temp3.toString());
-                ps.println("goto label_" + stack_labels.pop());
-                ps.println("label_" + stack_labels.pop() + ":");
+                ps.println("goto label_" + (Num_label - 1));
+                ps.println("label_" + Num_label + ":");
             }
 
             stack_output_streams.push(out);
-            temp1.reset();
-            temp2.reset();
-            temp3.reset();
         }
 
         public void enterInit_expression(CorundumParser.Init_expressionContext ctx) {
-            temp_1_stream.reset();
-            stack_output_streams.push(temp_1_stream);
+            ByteArrayOutputStream temp_1 = new ByteArrayOutputStream();
+            stack_output_streams.push(temp_1);
         }
 
         public void enterCond_expression(CorundumParser.Cond_expressionContext ctx) {
-            temp_2_stream.reset();
-            stack_output_streams.push(temp_2_stream);
+            ByteArrayOutputStream temp_2 = new ByteArrayOutputStream();
+            stack_output_streams.push(temp_2);
         }
 
         public void exitCond_expression(CorundumParser.Cond_expressionContext ctx) {
@@ -596,13 +591,13 @@ public class Walker {
         }
 
         public void enterLoop_expression(CorundumParser.Loop_expressionContext ctx) {
-            temp_3_stream.reset();
-            stack_output_streams.push(temp_3_stream);
+            ByteArrayOutputStream temp_3 = new ByteArrayOutputStream();
+            stack_output_streams.push(temp_3);
         }
 
         public void enterFor_statement_body(CorundumParser.For_statement_bodyContext ctx) {
-            temp_4_stream.reset();
-            stack_output_streams.push(temp_4_stream);
+            ByteArrayOutputStream temp_4 = new ByteArrayOutputStream();
+            stack_output_streams.push(temp_4);
         }
 
         public void exitComparison_list(CorundumParser.Comparison_listContext ctx) {
