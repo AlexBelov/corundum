@@ -36,6 +36,10 @@ for(i = 0, a = 0; i<10 && a<20; i+=1, a+=1)
 	end
 end
 
+for i=0; i<10; i+=1
+	c = 2
+end
+
 a = 10
 while a > 0
 	a -= 1

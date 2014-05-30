@@ -31,6 +31,7 @@ public class Walker {
         public int Num_reg_int = 0;
         public int Num_label = 0;
         LinkedList<String> definitions = new LinkedList<String>();
+        LinkedList<String> func_definitions = new LinkedList<String>();
 
         public static boolean is_defined(java.util.LinkedList<String> definitions, String variable) {
             int index = definitions.indexOf(variable);
@@ -564,6 +565,19 @@ public class Walker {
             if (ctx.getChildCount() == 11) {
                 ps.println(temp1.toString());
                 String cond = string_values.get(ctx.getChild(4));
+                Num_label++;
+                ps.println("label_" + Num_label + ":");
+                Num_label++;
+                ps.println(temp2.toString());
+                ps.println("unless " + cond + " goto label_" + Num_label);
+                ps.println(temp4.toString());
+                ps.println(temp3.toString());
+                ps.println("goto label_" + (Num_label - 1));
+                ps.println("label_" + Num_label + ":");
+            }
+            else if (ctx.getChildCount() == 9) {
+                ps.println(temp1.toString());
+                String cond = string_values.get(ctx.getChild(3));
                 Num_label++;
                 ps.println("label_" + Num_label + ":");
                 Num_label++;
