@@ -14,9 +14,14 @@ expression : function_definition
            | return_statement
            | while_statement
            | for_statement
+           | pir_inline
            ;
 
 require_block : REQUIRE literal_t;
+
+pir_inline : PIR crlf pir_expression_list END;
+
+pir_expression_list : expression_list;
 
 function_definition : function_definition_header function_definition_body END;
 
@@ -280,6 +285,7 @@ REQUIRE : 'require';
 END : 'end';
 DEF : 'def';
 RETURN : 'return';
+PIR : 'pir';
 
 IF: 'if';
 ELSE : 'else';

@@ -705,6 +705,23 @@ public class Walker {
             stack_output_streams.push(out);
         }
 
+        // ======================================== PIR inline ========================================
+
+        public void enterPir_expression_list(CorundumParser.Pir_expression_listContext ctx) {
+            ByteArrayOutputStream empty_stream = new ByteArrayOutputStream();
+            stack_output_streams.push(empty_stream);
+        }
+
+        public void exitPir_expression_list(CorundumParser.Pir_expression_listContext ctx) {
+            ByteArrayOutputStream empty_stream = stack_output_streams.pop();
+            ByteArrayOutputStream out = stack_output_streams.pop();
+            PrintStream ps = new PrintStream(out);
+
+            ps.println(ctx.getText());
+
+            stack_output_streams.push(out);
+        }
+
         // ======================================== Terminal node ========================================
 
         public void visitTerminal(TerminalNode node) {
