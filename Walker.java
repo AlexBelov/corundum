@@ -30,6 +30,7 @@ public class Walker {
         public int Num_reg = 0;
         public int Num_reg_int = 0;
         public int Num_label = 0;
+        Stack<Integer> stack_loop_labels = new Stack<Integer>();
         LinkedList<String> definitions = new LinkedList<String>();
         LinkedList<String> func_definitions = new LinkedList<String>();
 
@@ -506,7 +507,7 @@ public class Walker {
 
             if (ctx.getChild(4).getText().contains("else")) {
                 Num_label++;
-                ps.println("goto label_" + Num_label + ":");
+                ps.println("goto label_" + Num_label);
                 ps.println("label_" + (Num_label - 1) + ":");              
                 ps.println(else_body.toString());     
             }
@@ -535,7 +536,7 @@ public class Walker {
             ps.println(cond.toString());
             ps.println("unless " + condition_var + " goto label_" + Num_label);
             Num_label++;
-            ps.println("goto label_" + Num_label + ":");
+            ps.println("goto label_" + Num_label);
             ps.println("label_" + (Num_label - 1) + ":");
 
             ps.println(body.toString());
@@ -554,6 +555,11 @@ public class Walker {
 
         // ======================================== FOR loop ========================================
 
+        public void enterFor_statement(CorundumParser.For_statementContext ctx) {
+            stack_loop_labels.push(++Num_label);
+            stack_loop_labels.push(++Num_label);
+        }
+
         public void exitFor_statement(CorundumParser.For_statementContext ctx) {
             ByteArrayOutputStream temp4 = stack_output_streams.pop();
             ByteArrayOutputStream temp3 = stack_output_streams.pop();
@@ -562,31 +568,30 @@ public class Walker {
             ByteArrayOutputStream out = stack_output_streams.pop();
             PrintStream ps = new PrintStream(out);
 
+            int label_end = stack_loop_labels.pop();
+            int label_begin = stack_loop_labels.pop();
+
             if (ctx.getChildCount() == 11) {
                 ps.println(temp1.toString());
                 String cond = string_values.get(ctx.getChild(4));
-                Num_label++;
-                ps.println("label_" + Num_label + ":");
-                Num_label++;
+                ps.println("label_" + label_begin + ":");
                 ps.println(temp2.toString());
-                ps.println("unless " + cond + " goto label_" + Num_label);
+                ps.println("unless " + cond + " goto label_" + label_end);
                 ps.println(temp4.toString());
                 ps.println(temp3.toString());
-                ps.println("goto label_" + (Num_label - 1));
-                ps.println("label_" + Num_label + ":");
+                ps.println("goto label_" + label_begin);
+                ps.println("label_" + label_end + ":");
             }
             else if (ctx.getChildCount() == 9) {
                 ps.println(temp1.toString());
                 String cond = string_values.get(ctx.getChild(3));
-                Num_label++;
-                ps.println("label_" + Num_label + ":");
-                Num_label++;
+                ps.println("label_" + label_begin + ":");
                 ps.println(temp2.toString());
-                ps.println("unless " + cond + " goto label_" + Num_label);
+                ps.println("unless " + cond + " goto label_" + label_end);
                 ps.println(temp4.toString());
                 ps.println(temp3.toString());
-                ps.println("goto label_" + (Num_label - 1));
-                ps.println("label_" + Num_label + ":");
+                ps.println("goto label_" + label_begin);
+                ps.println("label_" + label_end + ":");
             }
 
             stack_output_streams.push(out);
@@ -686,21 +691,27 @@ public class Walker {
 
         // ======================================== WHILE loop ========================================
 
+        public void enterWhile_statement(CorundumParser.While_statementContext ctx) {
+            stack_loop_labels.push(++Num_label);
+            stack_loop_labels.push(++Num_label);
+        }
+
         public void exitWhile_statement(CorundumParser.While_statementContext ctx) {
             ByteArrayOutputStream body = stack_output_streams.pop();
             ByteArrayOutputStream cond = stack_output_streams.pop();
             ByteArrayOutputStream out = stack_output_streams.pop();
             PrintStream ps = new PrintStream(out);
 
+            int label_end = stack_loop_labels.pop();
+            int label_begin = stack_loop_labels.pop();
+
             String condition_var = string_values.get(ctx.getChild(1));
-            Num_label++;
-            ps.println("label_" + Num_label + ":");
-            Num_label++;
+            ps.println("label_" + label_begin + ":");
             ps.println(cond.toString());
-            ps.println("unless " + condition_var + " goto label_" + Num_label);
+            ps.println("unless " + condition_var + " goto label_" + label_end);
             ps.println(body.toString());
-            ps.println("goto label_" + (Num_label - 1));
-            ps.println("label_" + Num_label + ":");
+            ps.println("goto label_" + label_begin);
+            ps.println("label_" + label_end + ":");
 
             stack_output_streams.push(out);
         }
@@ -719,6 +730,19 @@ public class Walker {
 
             ps.println(ctx.getText());
 
+            stack_output_streams.push(out);
+        }
+
+        // ======================================== BREAK ========================================
+
+        public void exitBreak_expression(CorundumParser.Break_expressionContext ctx) {
+            ByteArrayOutputStream out = stack_output_streams.pop();
+            PrintStream ps = new PrintStream(out);
+            int label_end_current_loop = stack_loop_labels.pop();
+
+            ps.println("goto label_" + label_end_current_loop);
+
+            stack_loop_labels.push(label_end_current_loop);
             stack_output_streams.push(out);
         }
 

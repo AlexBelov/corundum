@@ -97,10 +97,10 @@ statement_body : statement_expression_list;
 
 statement_expression_list : expression terminator
                           | RETRY terminator
-                          | BREAK terminator
+                          | break_expression terminator
                           | statement_expression_list expression terminator
                           | statement_expression_list RETRY terminator
-                          | statement_expression_list BREAK terminator
+                          | statement_expression_list break_expression terminator
                           ;
 
 assignment : var_id=lvalue op=ASSIGN rvalue
@@ -245,6 +245,8 @@ rvalue : lvalue
        | LEFT_RBRACKET rvalue RIGHT_RBRACKET    
        ;
 
+break_expression : BREAK;
+
 literal_t : LITERAL;
 
 float_t : FLOAT;
@@ -347,4 +349,4 @@ INT : [0-9]+;
 FLOAT : [0-9]*'.'[0-9]+;
 ID : [a-zA-Z_][a-zA-Z0-9_]*;
 ID_GLOBAL : '$'ID;
-ID_FUNCTION : ID[!?];
+ID_FUNCTION : ID[?];
