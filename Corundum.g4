@@ -4,6 +4,7 @@ prog : expression_list;
 
 expression_list : expression terminator
                 | expression_list expression terminator
+                | terminator
                 ;
 
 expression : function_definition
