@@ -47,10 +47,26 @@ public class Walker {
             else return s + repeat(s, times-1);
         }
 
-        // ======================================== Enter prog ========================================
+        // ======================================== Prog ========================================
 
         public void enterProg(CorundumParser.ProgContext ctx) {
+            ByteArrayOutputStream out = main_stream;
+            PrintStream ps = new PrintStream(out);
+
+            ps.println(".sub main");
+
             stack_definitions.push(main_definitions);
+            stack_output_streams.push(out);
+        }
+
+        public void exitProg(CorundumParser.ProgContext ctx) {
+            ByteArrayOutputStream out = main_stream;
+            PrintStream ps = new PrintStream(out);
+
+            ps.println(".end");
+
+            stack_definitions.pop();
+            stack_output_streams.push(out);
         }
 
         // ======================================== Integer ========================================
@@ -1023,7 +1039,6 @@ public class Walker {
         ParseTreeWalker walker = new ParseTreeWalker();
 
         Evaluator eval = new Evaluator();
-        eval.stack_output_streams.push(eval.main_stream);
         walker.walk(eval, tree);
 
         System.out.println("\n======================================================");
