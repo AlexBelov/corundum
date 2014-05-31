@@ -1041,7 +1041,6 @@ public class Compiler {
         Evaluator eval = new Evaluator();
         walker.walk(eval, tree);
 
-        System.out.println("\n======================================================");
         ByteArrayOutputStream out = eval.stack_output_streams.pop();
         System.out.println(out.toString());
     }

@@ -61,21 +61,21 @@ for i = 0; i<10; i+=1
 	end
 end
 
-func0()
-func1(1)
-func2(2+3, 3, "Hello "+"world!")
-func3(a+t,b,c)
-func4(a=4+3, b="Hello "+"world!")
+# func0()
+# func1(1)
+# func2(2+3, 3, "Hello "+"world!")
+# func3(a+t,b,c)
+# func4(a=4+3, b="Hello "+"world!")
 
-def func1 (a,b,c)
-	a = 1
-	return a
-end
+# def func1 (a,b,c)
+# 	a = 1
+# 	return a
+# end
 
-def func2 ()
-	a = []
-	a[1] = 2
-	a[2] = 3
-	b = a[2]
-	return b
-end
+# def func2 ()
+# 	a = []
+# 	a[1] = 2
+# 	a[2] = 3
+# 	b = a[2]
+# 	return b
+# end
