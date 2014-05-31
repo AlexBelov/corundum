@@ -453,9 +453,9 @@ public class Walker {
 
             if (!is_defined(definitions, var)) {
                 ps.println(".local pmc " + var);
-                ps.println(var + " = new \"ResizablePMCArray\"");
                 definitions.add(var);
             }
+            ps.println(var + " = new \"ResizablePMCArray\"");
 
             stack_output_streams.push(out);
         }
@@ -832,6 +832,7 @@ public class Walker {
             args = args.replaceAll(",$", "");
             // ASSIGNMENT of dynamic function params
             ps.println(assignment_stream.toString());
+            // call of function
             ps.println(ctx.name.getText() + "(" + args + ")");
 
             stack_output_streams.push(out);
@@ -893,6 +894,57 @@ public class Walker {
 
             stack_output_streams.push(out);
             stack_output_streams.push(assignment_stream);
+        }
+
+        // ======================================== FUNCTION definition ========================================
+
+        public void enterFunction_definition(CorundumParser.Function_definitionContext ctx) {
+            ByteArrayOutputStream func_params = new ByteArrayOutputStream();
+            stack_output_streams.push(func_params);
+        }
+
+        public void exitFunction_definition(CorundumParser.Function_definitionContext ctx) {
+            ByteArrayOutputStream func_body = stack_output_streams.pop();
+            ByteArrayOutputStream func_params = stack_output_streams.pop();
+            ByteArrayOutputStream out = stack_output_streams.pop();
+            PrintStream ps = new PrintStream(out);
+
+            String func_name = string_values.get(ctx.getChild(0));
+            ps.println(".sub " + func_name);
+            ps.println(func_params.toString());
+            ps.println(func_body.toString());
+            ps.println(".end");
+
+            stack_output_streams.push(out);
+        }
+
+        public void enterFunction_definition_body(CorundumParser.Function_definition_bodyContext ctx) {
+            ByteArrayOutputStream func_body = new ByteArrayOutputStream();
+            stack_output_streams.push(func_body);
+        }
+
+        public void exitFunction_definition_param_id(CorundumParser.Function_definition_param_idContext ctx) {
+            ByteArrayOutputStream out = stack_output_streams.pop();
+            PrintStream ps = new PrintStream(out);
+
+            String param_id = ctx.getChild(0).getText();
+            ps.println(".param pmc " + param_id);
+
+            stack_output_streams.push(out);
+        }
+
+        public void exitFunction_definition_header(CorundumParser.Function_definition_headerContext ctx) {
+            string_values.put(ctx, ctx.getChild(1).getText());
+        }
+
+        public void exitReturn_statement(CorundumParser.Return_statementContext ctx) {
+            ByteArrayOutputStream out = stack_output_streams.pop();
+            PrintStream ps = new PrintStream(out);
+
+            String return_val = ctx.getChild(1).getText();
+            ps.println(".return " + return_val);
+
+            stack_output_streams.push(out);
         }
 
         // ======================================== Terminal node ========================================

@@ -36,13 +36,16 @@ function_name : id_function
               | id
               ;
 
-function_definition_params : LEFT_RBRACKET function_definition_params_list RIGHT_RBRACKET
+function_definition_params : LEFT_RBRACKET RIGHT_RBRACKET
+                           | LEFT_RBRACKET function_definition_params_list RIGHT_RBRACKET
                            | function_definition_params_list
                            ;
 
-function_definition_params_list : id
-                                | function_definition_params_list COMMA id
+function_definition_params_list : function_definition_param_id
+                                | function_definition_params_list COMMA function_definition_param_id
                                 ;
+
+function_definition_param_id : id;
 
 return_statement : RETURN rvalue;
 

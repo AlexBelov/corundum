@@ -69,4 +69,13 @@ func4(a=4+3, b="Hello "+"world!")
 
 def func1 (a,b,c)
 	a = 1
+	return a
+end
+
+def func2 ()
+	mas1 = []
+	mas1[1] = 2
+	mas1[2] = 3
+	b = mas1[2]
+	return b
 end
