@@ -19,6 +19,8 @@ mas[2] = "String"
 
 a = mas[2]
 
+a = 2
+
 if a == 1
 	a = 2
 	unless b == 2
@@ -64,3 +66,7 @@ func1(1)
 func2(2+3, 3, "Hello "+"world!")
 func3(a+t,b,c)
 func4(a=4+3, b="Hello "+"world!")
+
+def func1 (a,b,c)
+	a = 1
+end

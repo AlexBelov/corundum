@@ -452,6 +452,7 @@ public class Walker {
             String var = ctx.var_id.getText();
 
             if (!is_defined(definitions, var)) {
+                ps.println(".local pmc " + var);
                 ps.println(var + " = new \"ResizablePMCArray\"");
                 definitions.add(var);
             }

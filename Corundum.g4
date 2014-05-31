@@ -63,6 +63,8 @@ function_unnamed_param : ( int_result | float_result | string_result | dynamic_r
 
 function_named_param : id op=ASSIGN ( int_result | float_result | string_result | dynamic_result );
 
+all_result : ( int_result | float_result | string_result | dynamic_result );
+
 //if_elsif_statement : ELSIF cond_expression crlf statement_body
 //                   | ELSIF cond_expression crlf statement_body else_token crlf statement_body
 //                   | ELSIF cond_expression crlf statement_body if_elsif_statement
