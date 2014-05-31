@@ -501,7 +501,7 @@ public class Walker {
             ps.println(cond.toString());
             ps.println("if " + condition_var + " goto label_" + Num_label);
             Num_label++;
-            ps.println("goto label_" + Num_label + ":");
+            ps.println("goto label_" + Num_label);
             ps.println("label_" + (Num_label - 1) + ":");
 
             ps.println(body.toString());
