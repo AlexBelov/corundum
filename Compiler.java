@@ -11,7 +11,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.Stack;
 import java.util.LinkedList;
 
-public class Walker {
+public class Compiler {
     public static class Evaluator extends CorundumBaseListener {
         ParseTreeProperty<Integer> int_values = new ParseTreeProperty<Integer>();
         ParseTreeProperty<Float> float_values = new ParseTreeProperty<Float>();
