@@ -73,9 +73,9 @@ def func1 (a,b,c)
 end
 
 def func2 ()
-	mas1 = []
-	mas1[1] = 2
-	mas1[2] = 3
-	b = mas1[2]
+	a = []
+	a[1] = 2
+	a[2] = 3
+	b = a[2]
 	return b
 end

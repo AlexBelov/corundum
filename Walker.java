@@ -31,8 +31,8 @@ public class Walker {
         public int Num_reg_int = 0;
         public int Num_label = 0;
         Stack<Integer> stack_loop_labels = new Stack<Integer>();
-        LinkedList<String> definitions = new LinkedList<String>();
-        LinkedList<String> func_definitions = new LinkedList<String>();
+        LinkedList<String> main_definitions = new LinkedList<String>();
+        Stack<LinkedList<String>> stack_definitions = new Stack<LinkedList<String>>();
 
         public static boolean is_defined(java.util.LinkedList<String> definitions, String variable) {
             int index = definitions.indexOf(variable);
@@ -47,11 +47,18 @@ public class Walker {
             else return s + repeat(s, times-1);
         }
 
+        // ======================================== Enter prog ========================================
+
+        public void enterProg(CorundumParser.ProgContext ctx) {
+            stack_definitions.push(main_definitions);
+        }
+
         // ======================================== Integer ========================================
 
         public void enterInt_assignment(CorundumParser.Int_assignmentContext ctx) {
             ByteArrayOutputStream out = stack_output_streams.pop();
             PrintStream ps = new PrintStream(out);
+            LinkedList<String> definitions = stack_definitions.pop();
 
             switch(ctx.op.getType()) {
                 case CorundumParser.ASSIGN:
@@ -71,6 +78,7 @@ public class Walker {
             }
 
             stack_output_streams.push(out); 
+            stack_definitions.push(definitions);
         }
 
         public void exitInt_assignment(CorundumParser.Int_assignmentContext ctx) {
@@ -132,6 +140,7 @@ public class Walker {
         public void enterFloat_assignment(CorundumParser.Float_assignmentContext ctx) {
             ByteArrayOutputStream out = stack_output_streams.pop();
             PrintStream ps = new PrintStream(out);
+            LinkedList<String> definitions = stack_definitions.pop();
 
             switch(ctx.op.getType()) {
                 case CorundumParser.ASSIGN:
@@ -151,6 +160,7 @@ public class Walker {
             }
 
             stack_output_streams.push(out);
+            stack_definitions.push(definitions);
         }
 
         public void exitFloat_assignment(CorundumParser.Float_assignmentContext ctx) {
@@ -230,6 +240,7 @@ public class Walker {
         public void enterString_assignment(CorundumParser.String_assignmentContext ctx) {
             ByteArrayOutputStream out = stack_output_streams.pop();
             PrintStream ps = new PrintStream(out);
+            LinkedList<String> definitions = stack_definitions.pop();
 
             switch(ctx.op.getType()) {
                 case CorundumParser.ASSIGN:
@@ -249,6 +260,7 @@ public class Walker {
             }
 
             stack_output_streams.push(out);
+            stack_definitions.push(definitions);
         }
 
         public void exitString_assignment(CorundumParser.String_assignmentContext ctx) {
@@ -320,6 +332,7 @@ public class Walker {
         public void enterDynamic_assignment(CorundumParser.Dynamic_assignmentContext ctx) {
             ByteArrayOutputStream out = stack_output_streams.pop();
             PrintStream ps = new PrintStream(out);
+            LinkedList<String> definitions = stack_definitions.pop();
 
             switch(ctx.op.getType()) {
                 case CorundumParser.ASSIGN:
@@ -341,6 +354,7 @@ public class Walker {
             }
 
             stack_output_streams.push(out);
+            stack_definitions.push(definitions);
         }
 
         public void exitDynamic_assignment(CorundumParser.Dynamic_assignmentContext ctx) {
@@ -448,6 +462,7 @@ public class Walker {
         public void enterInitial_array_assignment(CorundumParser.Initial_array_assignmentContext ctx) {
             ByteArrayOutputStream out = stack_output_streams.pop();
             PrintStream ps = new PrintStream(out);
+            LinkedList<String> definitions = stack_definitions.pop();
 
             String var = ctx.var_id.getText();
 
@@ -458,11 +473,13 @@ public class Walker {
             ps.println(var + " = new \"ResizablePMCArray\"");
 
             stack_output_streams.push(out);
+            stack_definitions.push(definitions);
         }
 
         public void exitArray_assignment(CorundumParser.Array_assignmentContext ctx) {
             ByteArrayOutputStream out = stack_output_streams.pop();
             PrintStream ps = new PrintStream(out);
+            LinkedList<String> definitions = stack_definitions.pop();
 
             String var = ctx.var_id.getText();
 
@@ -474,6 +491,7 @@ public class Walker {
             }
 
             stack_output_streams.push(out);
+            stack_definitions.push(definitions);
         }
 
         public void exitArray_selector(CorundumParser.Array_selectorContext ctx) {
@@ -899,6 +917,8 @@ public class Walker {
         // ======================================== FUNCTION definition ========================================
 
         public void enterFunction_definition(CorundumParser.Function_definitionContext ctx) {
+            LinkedList<String> func_definitions = new LinkedList<String>();
+            stack_definitions.push(func_definitions);
             ByteArrayOutputStream func_params = new ByteArrayOutputStream();
             stack_output_streams.push(func_params);
         }
@@ -915,6 +935,7 @@ public class Walker {
             ps.println(func_body.toString());
             ps.println(".end");
 
+            stack_definitions.pop();
             stack_output_streams.push(out);
         }
 
