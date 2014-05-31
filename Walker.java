@@ -800,15 +800,6 @@ public class Walker {
             stack_output_streams.push(assignment_stream);
         }
 
-        public void enterFunction_named_param(CorundumParser.Function_named_paramContext ctx) {
-            ByteArrayOutputStream assignment_stream = stack_output_streams.pop();
-            ByteArrayOutputStream args_stream = stack_output_streams.pop();
-            ByteArrayOutputStream out = stack_output_streams.pop();
-            stack_output_streams.push(out);
-            stack_output_streams.push(args_stream);
-            stack_output_streams.push(assignment_stream);
-        }
-
         public void exitFunction_named_param(CorundumParser.Function_named_paramContext ctx) {
             ByteArrayOutputStream assignment_stream = stack_output_streams.pop();
             ByteArrayOutputStream out = stack_output_streams.pop();
