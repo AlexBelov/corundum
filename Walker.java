@@ -659,8 +659,8 @@ public class Walker {
             ByteArrayOutputStream out = stack_output_streams.pop();
             PrintStream ps = new PrintStream(out);
 
-            String left = ctx.left.getText();
-            String right = ctx.right.getText();
+            String left = string_values.get(ctx.getChild(0));
+            String right = string_values.get(ctx.getChild(2));
 
             switch(ctx.op.getType()) {
                 case CorundumParser.LESS:
@@ -688,6 +688,70 @@ public class Walker {
             Num_reg_int++;
 
             stack_output_streams.push(out);
+        }
+
+        public void exitComp_var(CorundumParser.Comp_varContext ctx) {
+            ByteArrayOutputStream out = stack_output_streams.pop();
+            PrintStream ps = new PrintStream(out);
+
+            String type_arg = which_value.get(ctx.getChild(0));
+            String str_output = "";
+
+            switch(type_arg) {
+                case "Integer":
+                    int result_int = int_values.get(ctx.getChild(0));
+                    str_output = "$P" + Num_reg + " = " + result_int;
+                    break;
+                case "Float":
+                    float result_float = float_values.get(ctx.getChild(0));
+                    str_output = "$P" + Num_reg + " = " + result_float;
+                    break;
+                case "String":
+                    String result_string = string_values.get(ctx.getChild(0));
+                    str_output = "$P" + Num_reg + " = " + result_string;
+                    break;
+                case "Dynamic":
+                    result_string = string_values.get(ctx.getChild(0));
+                    string_values.put(ctx, result_string);
+                    which_value.put(ctx, type_arg);
+                    stack_output_streams.push(out);
+                    return;
+            }
+
+            ps.println("$P" + Num_reg + " = new \"Integer\"");
+            ps.println(str_output);
+            string_values.put(ctx, "$P" + Num_reg);
+            which_value.put(ctx, "Dynamic");
+            Num_reg++;
+
+            stack_output_streams.push(out);
+        }
+
+        public void exitAll_result(CorundumParser.All_resultContext ctx) {
+            String type_arg = which_value.get(ctx.getChild(0));
+
+            switch(type_arg) {
+                case "Integer":
+                    int result_int = int_values.get(ctx.getChild(0));
+                    int_values.put(ctx, result_int);
+                    which_value.put(ctx, type_arg);
+                    break;
+                case "Float":
+                    float result_float = float_values.get(ctx.getChild(0));
+                    float_values.put(ctx, result_float);
+                    which_value.put(ctx, type_arg);
+                    break;
+                case "String":
+                    String result_string = string_values.get(ctx.getChild(0));
+                    string_values.put(ctx, result_string);
+                    which_value.put(ctx, type_arg);
+                    break;
+                case "Dynamic":
+                    result_string = string_values.get(ctx.getChild(0));
+                    string_values.put(ctx, result_string);
+                    which_value.put(ctx, type_arg);
+                    break;
+            }
         }
 
         // ======================================== WHILE loop ========================================

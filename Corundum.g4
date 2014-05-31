@@ -202,9 +202,13 @@ comparison_list : left=comparison op=BIT_AND right=comparison_list
                 | comparison
                 ;
 
-comparison : left=rvalue op=( LESS | GREATER | LESS_EQUAL | GREATER_EQUAL ) right=rvalue
-           | left=rvalue op=( EQUAL | NOT_EQUAL ) right=rvalue
+comparison : left=comp_var op=( LESS | GREATER | LESS_EQUAL | GREATER_EQUAL ) right=comp_var
+           | left=comp_var op=( EQUAL | NOT_EQUAL ) right=comp_var
            ;
+
+comp_var : all_result
+         | id
+         ;
 
 lvalue : id  
        | id_global        
