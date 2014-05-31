@@ -46,16 +46,22 @@ function_definition_params_list : id
 
 return_statement : RETURN rvalue;
 
-function_call : function_name LEFT_RBRACKET function_call_param_list RIGHT_RBRACKET
-              | function_name function_call_param_list
-              | function_name LEFT_RBRACKET RIGHT_RBRACKET
+function_call : name=function_name LEFT_RBRACKET params=function_call_param_list RIGHT_RBRACKET
+              | name=function_name params=function_call_param_list
+              | name=function_name LEFT_RBRACKET RIGHT_RBRACKET
               ;
 
 function_call_param_list : function_call_params;
 
-function_call_params : rvalue
-                     | function_call_params COMMA rvalue
+function_call_params : function_param
+                     | function_call_params COMMA function_param
                      ;
+
+function_param : ( function_unnamed_param | function_named_param );
+
+function_unnamed_param : ( int_result | float_result | string_result | dynamic_result );
+
+function_named_param : id op=ASSIGN ( int_result | float_result | string_result | dynamic_result );
 
 //if_elsif_statement : ELSIF cond_expression crlf statement_body
 //                   | ELSIF cond_expression crlf statement_body else_token crlf statement_body

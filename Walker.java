@@ -746,6 +746,99 @@ public class Walker {
             stack_output_streams.push(out);
         }
 
+        // ======================================== FUNCTION call ========================================
+
+        public void enterFunction_call(CorundumParser.Function_callContext ctx) {
+            ByteArrayOutputStream out = stack_output_streams.pop();
+            ByteArrayOutputStream assignment_stream = new ByteArrayOutputStream();
+            ByteArrayOutputStream args_stream = new ByteArrayOutputStream();
+            stack_output_streams.push(out);
+            stack_output_streams.push(args_stream);
+            stack_output_streams.push(assignment_stream);
+        }
+
+        public void exitFunction_call(CorundumParser.Function_callContext ctx) {
+            ByteArrayOutputStream assignment_stream = stack_output_streams.pop();
+            ByteArrayOutputStream args_stream = stack_output_streams.pop();
+            ByteArrayOutputStream out = stack_output_streams.pop();
+            PrintStream ps = new PrintStream(out);
+
+            String args = args_stream.toString();
+            args = args.replaceAll(",$", "");
+            // ASSIGNMENT of dynamic function params
+            ps.println(assignment_stream.toString());
+            ps.println(ctx.name.getText() + "(" + args + ")");
+
+            stack_output_streams.push(out);
+        }
+
+        public void exitFunction_unnamed_param(CorundumParser.Function_unnamed_paramContext ctx) {
+            ByteArrayOutputStream assignment_stream = stack_output_streams.pop();
+            ByteArrayOutputStream out = stack_output_streams.pop();
+            PrintStream ps = new PrintStream(out);
+
+            switch(which_value.get(ctx.getChild(0))) {
+                case "Integer":
+                    int result_int = int_values.get(ctx.getChild(0));
+                    ps.print(result_int + ",");
+                    break;
+                case "Float":
+                    float result_float = float_values.get(ctx.getChild(0));
+                    ps.print(result_float + ",");
+                    break;
+                case "String":
+                    String result_string = string_values.get(ctx.getChild(0));
+                    ps.print("\"" + result_string + "\",");
+                    break;
+                case "Dynamic":
+                    result_string = string_values.get(ctx.getChild(0));
+                    ps.print(result_string + ",");
+                    break;
+            }
+
+            stack_output_streams.push(out);
+            stack_output_streams.push(assignment_stream);
+        }
+
+        public void enterFunction_named_param(CorundumParser.Function_named_paramContext ctx) {
+            ByteArrayOutputStream assignment_stream = stack_output_streams.pop();
+            ByteArrayOutputStream args_stream = stack_output_streams.pop();
+            ByteArrayOutputStream out = stack_output_streams.pop();
+            stack_output_streams.push(out);
+            stack_output_streams.push(args_stream);
+            stack_output_streams.push(assignment_stream);
+        }
+
+        public void exitFunction_named_param(CorundumParser.Function_named_paramContext ctx) {
+            ByteArrayOutputStream assignment_stream = stack_output_streams.pop();
+            ByteArrayOutputStream out = stack_output_streams.pop();
+            PrintStream ps = new PrintStream(out);
+
+            String id_param = ctx.getChild(0).getText();
+
+            switch(which_value.get(ctx.getChild(2))) {
+                case "Integer":
+                    int result_int = int_values.get(ctx.getChild(2));
+                    ps.print(result_int + " :named(\"" + id_param + "\"),");
+                    break;
+                case "Float":
+                    float result_float = float_values.get(ctx.getChild(2));
+                    ps.print(result_float + " :named(\"" + id_param + "\"),");
+                    break;
+                case "String":
+                    String result_string = string_values.get(ctx.getChild(2));
+                    ps.print("\"" + result_string + "\" :named(\"" + id_param + "\"),");
+                    break;
+                case "Dynamic":
+                    result_string = string_values.get(ctx.getChild(2));
+                    ps.print(result_string + " :named(\"" + id_param + "\"),");
+                    break;
+            }
+
+            stack_output_streams.push(out);
+            stack_output_streams.push(assignment_stream);
+        }
+
         // ======================================== Terminal node ========================================
 
         public void visitTerminal(TerminalNode node) {
