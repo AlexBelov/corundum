@@ -1,6 +1,6 @@
 .sub puts
-	.param pmc a
+	.param pmc str
 	$P1 = new "String"
-	$P1 = a
-	say $12
+	$P1 = str
+	say $P1
 .end

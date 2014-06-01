@@ -54,6 +54,7 @@
 # 	end
 # 	a = 10
 # 	while a > 0
+# 		puts "hahaha"
 # 		if a==2
 # 			break
 # 		end
@@ -89,3 +90,6 @@ end
 def func2(a)
 	return a*2
 end
+
+puts "Hello, I'm CORUNDUM"
+puts a

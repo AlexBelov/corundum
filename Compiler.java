@@ -69,11 +69,14 @@ public class Compiler {
             PrintStream ps = new PrintStream(out);
 
             ps.println("\n.end");
+            ps.println("\n.include \"std.pir\"");
 
             for (int i = 0; i < function_calls.size(); i++) {
                 String func_name = function_calls.get(i);
                 ByteArrayOutputStream fstream = function_definition_streams.get(func_name);
-                ps.println(fstream.toString());
+                if(fstream != null) {
+                   ps.println(fstream.toString()); 
+                }               
             }
 
             stack_definitions.pop();
