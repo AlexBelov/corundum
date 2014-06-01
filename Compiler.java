@@ -537,11 +537,85 @@ public class Compiler {
 
         // ======================================== IF statement ========================================
 
+        public void enterIf_statement(CorundumParser.If_statementContext ctx) {
+            stack_loop_labels.push(++Num_label);
+            stack_loop_labels.push(++Num_label);
+
+            String child_4 = ctx.getChild(4).getText();
+
+            if (child_4.contains("else") || child_4.contains("elsif")) {
+                stack_loop_labels.push(++Num_label);    
+            }
+        }
+
         public void exitIf_statement(CorundumParser.If_statementContext ctx) {
             ByteArrayOutputStream else_body = new ByteArrayOutputStream();
+            int label_end = 0;
+            String child_4 = ctx.getChild(4).getText();
 
-            if (ctx.getChild(4).getText().contains("else")) {
+            if (child_4.contains("else") || child_4.contains("elsif")) {
                 else_body = stack_output_streams.pop();     
+                label_end = stack_loop_labels.pop();
+            }
+
+            int label_false = stack_loop_labels.pop();
+            int label_true = stack_loop_labels.pop();
+
+            ByteArrayOutputStream body = stack_output_streams.pop();
+            ByteArrayOutputStream cond = stack_output_streams.pop();
+            ByteArrayOutputStream out = stack_output_streams.pop();
+            PrintStream ps = new PrintStream(out);
+            String condition_var = string_values.get(ctx.getChild(1));
+
+            ps.println("");
+            ps.println(cond.toString());
+            ps.println("if " + condition_var + " goto label_" + label_true);
+            ps.println("goto label_" + label_false);
+            ps.println("label_" + label_true + ":");
+
+            ps.println(body.toString());
+
+            if (child_4.contains("else") || child_4.contains("elsif")) {
+                ps.println("goto label_" + label_end);
+                ps.println("label_" + label_false + ":");              
+                ps.println(else_body.toString());     
+            }
+
+            ps.println("label_" + label_end + ":");
+
+            stack_output_streams.push(out);
+        }
+
+        // ======================================== ELSIF statement ========================================
+
+        public void enterIf_elsif_statement(CorundumParser.If_elsif_statementContext ctx) {
+            ByteArrayOutputStream elsif_stream = new ByteArrayOutputStream();
+            int label_end = 0;
+            int child_count = ctx.getChildCount();
+
+            if (child_count > 4) {
+                label_end = stack_loop_labels.pop();
+                stack_loop_labels.push(label_end);     
+            }
+
+            stack_loop_labels.push(++Num_label);
+            stack_loop_labels.push(++Num_label);
+
+            if (child_count > 4) {
+                stack_loop_labels.push(label_end);     
+            }
+
+            stack_output_streams.push(elsif_stream);
+        }
+
+        public void exitIf_elsif_statement(CorundumParser.If_elsif_statementContext ctx) {
+            ByteArrayOutputStream else_body = new ByteArrayOutputStream();
+            int label_end = 0;
+            int child_count = ctx.getChildCount();
+
+            if (child_count > 4) {
+                else_body = stack_output_streams.pop();   
+                label_end = stack_loop_labels.pop();  
             }
 
             ByteArrayOutputStream body = stack_output_streams.pop();
@@ -550,36 +624,54 @@ public class Compiler {
             PrintStream ps = new PrintStream(out);
             String condition_var = string_values.get(ctx.getChild(1));
 
-            Num_label++;
+            int label_false = stack_loop_labels.pop();
+            int label_true = stack_loop_labels.pop();
+
             ps.println("");
             ps.println(cond.toString());
-            ps.println("if " + condition_var + " goto label_" + Num_label);
-            Num_label++;
-            ps.println("goto label_" + Num_label);
-            ps.println("label_" + (Num_label - 1) + ":");
+            ps.println("if " + condition_var + " goto label_" + label_true);
+            ps.println("goto label_" + label_false);
+            ps.println("label_" + label_true + ":");
 
             ps.println(body.toString());
 
-            if (ctx.getChild(4).getText().contains("else")) {
-                Num_label++;
-                ps.println("goto label_" + Num_label);
-                ps.println("label_" + (Num_label - 1) + ":");              
+            if (child_count > 4) {
+                ps.println("goto label_" + label_end);
+                ps.println("label_" + label_false + ":");              
                 ps.println(else_body.toString());     
             }
-
-            ps.println("label_" + Num_label + ":");
+            else {
+                ps.println("label_" + label_false + ":");
+            }
 
             stack_output_streams.push(out);
         }
 
         // ======================================== UNLESS statement ========================================
 
+        public void enterUnless_statement(CorundumParser.Unless_statementContext ctx) {
+            stack_loop_labels.push(++Num_label);
+            stack_loop_labels.push(++Num_label);
+
+            String child_4 = ctx.getChild(4).getText();
+
+            if (child_4.contains("else") || child_4.contains("elsif")) {
+                stack_loop_labels.push(++Num_label);    
+            }
+        }
+
         public void exitUnless_statement(CorundumParser.Unless_statementContext ctx) {
             ByteArrayOutputStream else_body = new ByteArrayOutputStream();
+            int label_end = 0;
+            String child_4 = ctx.getChild(4).getText();
 
-            if (ctx.getChild(4).getText().contains("else")) {
+            if (child_4.contains("else") || child_4.contains("elsif")) {
                 else_body = stack_output_streams.pop();     
+                label_end = stack_loop_labels.pop();
             }
+
+            int label_false = stack_loop_labels.pop();
+            int label_true = stack_loop_labels.pop();
 
             ByteArrayOutputStream body = stack_output_streams.pop();
             ByteArrayOutputStream cond = stack_output_streams.pop();
@@ -587,24 +679,21 @@ public class Compiler {
             PrintStream ps = new PrintStream(out);
             String condition_var = string_values.get(ctx.getChild(1));
 
-            Num_label++;
             ps.println("");
             ps.println(cond.toString());
-            ps.println("unless " + condition_var + " goto label_" + Num_label);
-            Num_label++;
-            ps.println("goto label_" + Num_label);
-            ps.println("label_" + (Num_label - 1) + ":");
+            ps.println("unless " + condition_var + " goto label_" + label_true);
+            ps.println("goto label_" + label_false);
+            ps.println("label_" + label_true + ":");
 
             ps.println(body.toString());
 
-            if (ctx.getChild(4).getText().contains("else")) {
-                Num_label++;
-                ps.println("goto label_" + Num_label + ":");
-                ps.println("label_" + (Num_label - 1) + ":");              
+            if (child_4.contains("else") || child_4.contains("elsif")) {
+                ps.println("goto label_" + label_end);
+                ps.println("label_" + label_false + ":");              
                 ps.println(else_body.toString());     
             }
 
-            ps.println("label_" + Num_label + ":");
+            ps.println("label_" + label_end + ":");
 
             stack_output_streams.push(out);
         }

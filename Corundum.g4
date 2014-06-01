@@ -70,19 +70,21 @@ function_call_assignment : function_call;
 
 all_result : ( int_result | float_result | string_result | dynamic_result );
 
-//if_elsif_statement : ELSIF cond_expression crlf statement_body
-//                   | ELSIF cond_expression crlf statement_body else_token crlf statement_body
-//                   | ELSIF cond_expression crlf statement_body if_elsif_statement
-//                   ;
+elsif_statement : if_elsif_statement;
+
+if_elsif_statement : ELSIF cond_expression crlf statement_body
+                   | ELSIF cond_expression crlf statement_body else_token crlf statement_body
+                   | ELSIF cond_expression crlf statement_body if_elsif_statement
+                   ;
 
 if_statement : IF cond_expression crlf statement_body END
              | IF cond_expression crlf statement_body else_token crlf statement_body END
-             //| IF cond_expression crlf statement_body if_elsif_statement END
+             | IF cond_expression crlf statement_body elsif_statement END
              ;
 
 unless_statement : UNLESS cond_expression crlf statement_body END
                  | UNLESS cond_expression crlf statement_body else_token crlf statement_body END
-                 //| UNLESS cond_expression crlf statement_body if_elsif_statement END
+                 | UNLESS cond_expression crlf statement_body elsif_statement END
                  ;
 
 while_statement : WHILE cond_expression crlf statement_body END;

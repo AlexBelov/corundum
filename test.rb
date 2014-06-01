@@ -81,28 +81,50 @@
 # 	return b
 # end
 
-a = 4
-exp1 = 100+2*3/(3+4*3)
-exp2 = 100.5+2*3.1/(3+4*3)
-exp3 = "hello "*2
-exp4 = a + 2*3
+# a = 4
+# exp1 = 100+2*3/(3+4*3)
+# exp2 = 100.5+2*3.1/(3+4*3)
+# exp3 = "hello "*2
+# exp4 = a + 2*3
 
-a = func(1)*func2(5)
+# a = func(1)*func2(5)
 
-if "a" < "b"
-	puts "a < b"
-else
+# if "a" < "b"
+# 	puts "a < b"
+# else
+# 	puts "a > b"
+# end
+
+# def func(a)
+# 	return a*2
+# end
+
+# def func2(a)
+# 	return 1
+# end
+
+# puts "Hello, I'm CORUN\"DUM"
+# puts 'hahaha!'
+# puts a
+
+if 'a' > 'b'
 	puts "a > b"
+elsif 'a' < 'b'
+	puts "a < b"
 end
 
-def func(a)
-	return a*2
+if 'a' > 'b'
+	puts "a > b"
+elsif 'c' > 'd'
+	puts "c > d"
+elsif 'c' < 'd'
+	puts "c < d"
 end
 
-def func2(a)
-	return 1
+unless 'a' < 'b'
+	puts "a > b"
+elsif 'c' > 'd'
+	puts "c > d"
+else
+	puts "c < d"
 end
-
-puts "Hello, I'm CORUN\"DUM"
-puts 'hahaha!'
-puts a
