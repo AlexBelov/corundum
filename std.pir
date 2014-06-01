@@ -58,3 +58,20 @@ loop_file:
   if $P0 goto loop_file
   .return(array)
 .end
+
+.sub write_file
+  .param pmc file_name
+  .param pmc array
+  $P1 = array
+  $I1 = len($P1)
+  $S0 = file_name
+  $P0 = open $S0, "w"
+  $I0 = 0
+loop_file:
+  $S0 = $P1[$I0]
+  print $P0, $S0
+  $I0 = $I0 + 1
+  $S1 = $P1[$I0]
+  if $I0 <= $I1 goto loop_file
+  close $P0
+.end
