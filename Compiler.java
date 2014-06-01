@@ -10,6 +10,9 @@ import java.io.PrintStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Stack;
 import java.util.LinkedList;
+import java.util.ListIterator;
+import java.util.ArrayList;
+import java.util.Hashtable;
 
 public class Compiler {
     public static class Evaluator extends CorundumBaseListener {
@@ -19,6 +22,7 @@ public class Compiler {
         ParseTreeProperty<String> which_value = new ParseTreeProperty<String>();
 
         Stack<ByteArrayOutputStream> stack_output_streams = new Stack<ByteArrayOutputStream>();
+        Hashtable<String, ByteArrayOutputStream> function_definition_streams = new Hashtable<String, ByteArrayOutputStream>();
 
         ByteArrayOutputStream main_stream = new ByteArrayOutputStream();
         ByteArrayOutputStream func_stream = new ByteArrayOutputStream();
@@ -32,6 +36,7 @@ public class Compiler {
         public int Num_label = 0;
         Stack<Integer> stack_loop_labels = new Stack<Integer>();
         LinkedList<String> main_definitions = new LinkedList<String>();
+        ArrayList<String> function_calls = new ArrayList<String>();
         Stack<LinkedList<String>> stack_definitions = new Stack<LinkedList<String>>();
 
         public static boolean is_defined(java.util.LinkedList<String> definitions, String variable) {
@@ -63,8 +68,13 @@ public class Compiler {
             ByteArrayOutputStream out = main_stream;
             PrintStream ps = new PrintStream(out);
 
-            ps.println("");
-            ps.println(".end");
+            ps.println("\n.end");
+
+            for (int i = 0; i < function_calls.size(); i++) {
+                String func_name = function_calls.get(i);
+                ByteArrayOutputStream fstream = function_definition_streams.get(func_name);
+                ps.println(fstream.toString());
+            }
 
             stack_definitions.pop();
             stack_output_streams.push(out);
@@ -871,11 +881,14 @@ public class Compiler {
             PrintStream ps = new PrintStream(out);
 
             String args = args_stream.toString();
+            String func_name = ctx.name.getText();
             args = args.replaceAll(",$", "");
             // ASSIGNMENT of dynamic function params
             ps.println(assignment_stream.toString());
             // call of function
-            ps.println(ctx.name.getText() + "(" + args + ")");
+            ps.println(func_name + "(" + args + ")");
+
+            function_calls.add(func_name);
 
             stack_output_streams.push(out);
         }
@@ -957,6 +970,8 @@ public class Compiler {
             stack_definitions.push(func_definitions);
             ByteArrayOutputStream func_params = new ByteArrayOutputStream();
             stack_output_streams.push(func_params);
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            stack_output_streams.push(out);
         }
 
         public void exitFunction_definition(CorundumParser.Function_definitionContext ctx) {
@@ -966,13 +981,15 @@ public class Compiler {
             PrintStream ps = new PrintStream(out);
 
             String func_name = string_values.get(ctx.getChild(0));
-            ps.println(".sub " + func_name);
-            ps.println(func_params.toString());
+            ps.println("\n.sub " + func_name);
+            ps.println("");
+            ps.print(func_params.toString());
             ps.println(func_body.toString());
-            ps.println(".end");
+            ps.print(".end");
+
+            function_definition_streams.put(func_name, out);
 
             stack_definitions.pop();
-            stack_output_streams.push(out);
         }
 
         public void enterFunction_definition_body(CorundumParser.Function_definition_bodyContext ctx) {
@@ -998,8 +1015,8 @@ public class Compiler {
             ByteArrayOutputStream out = stack_output_streams.pop();
             PrintStream ps = new PrintStream(out);
 
-            String return_val = ctx.getChild(1).getText();
-            ps.println(".return " + return_val);
+            String return_val = string_values.get(ctx.getChild(1));
+            ps.println(".return(" + return_val + ")");
 
             stack_output_streams.push(out);
         }

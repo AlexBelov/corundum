@@ -80,4 +80,12 @@
 # 	return b
 # end
 
-a = func(1) + func1(2,3,4)*5
+a = func(1)*func2(5)
+
+def func(a)
+	return a*2
+end
+
+def func2(a)
+	return a*2
+end
