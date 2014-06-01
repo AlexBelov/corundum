@@ -798,7 +798,7 @@ public class Compiler {
                     break;
                 case "String":
                     String result_string = string_values.get(ctx.getChild(0));
-                    string_values.put(ctx, result_string);
+                    string_values.put(ctx, "\"" + result_string + "\"");
                     which_value.put(ctx, type_arg);
                     break;
                 case "Dynamic":

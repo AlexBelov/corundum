@@ -89,6 +89,12 @@ exp4 = a + 2*3
 
 a = func(1)*func2(5)
 
+if "a" < "b"
+	puts "a < b"
+else
+	puts "a > b"
+end
+
 def func(a)
 	return a*2
 end
