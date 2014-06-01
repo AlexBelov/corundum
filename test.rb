@@ -87,44 +87,44 @@
 # exp3 = "hello "*2
 # exp4 = a + 2*3
 
-# a = func(1)*func2(5)
+a = func(1)*func2(5)
 
-# if "a" < "b"
-# 	puts "a < b"
-# else
-# 	puts "a > b"
-# end
-
-# def func(a)
-# 	return a*2
-# end
-
-# def func2(a)
-# 	return 1
-# end
-
-# puts "Hello, I'm CORUN\"DUM"
-# puts 'hahaha!'
-# puts a
-
-if 'a' > 'b'
-	puts "a > b"
-elsif 'a' < 'b'
+if "a" < "b"
 	puts "a < b"
-end
-
-if 'a' > 'b'
-	puts "a > b"
-elsif 'c' > 'd'
-	puts "c > d"
-elsif 'c' < 'd'
-	puts "c < d"
-end
-
-unless 'a' < 'b'
-	puts "a > b"
-elsif 'c' > 'd'
-	puts "c > d"
 else
-	puts "c < d"
+	puts "a > b"
 end
+
+def func(a)
+	return a*2
+end
+
+def func2(a)
+	return 1
+end
+
+puts "Hello, I'm CORUN\"DUM"
+puts 'hahaha!'
+puts a
+
+# if 'a' > 'b'
+# 	puts "a > b"
+# elsif 'a' < 'b'
+# 	puts "a < b"
+# end
+
+# if 'a' > 'b'
+# 	puts "a > b"
+# elsif 'c' > 'd'
+# 	puts "c > d"
+# elsif 'c' < 'd'
+# 	puts "c < d"
+# end
+
+# unless 'a' < 'b'
+# 	puts "a > b"
+# elsif 'c' > 'd'
+# 	puts "c > d"
+# else
+# 	puts "c < d"
+# end
