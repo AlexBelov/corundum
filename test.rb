@@ -91,6 +91,6 @@ def func2(a)
 	return a*2
 end
 
-puts "Hello, I'm CORUNDUM"
+puts "Hello, I'm CORUN\"DUM"
 puts 'hahaha!'
 puts a
