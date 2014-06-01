@@ -129,36 +129,24 @@
 # 	puts "c < d"
 # end
 
-mas = []
-mas = read_file("test.txt")
+# mas = []
+# mas = read_file("test.txt")
 
-length = len(mas)
+# length = len(mas)
 
-for(i = 1; i < length - 1; i+=1)
-	for(j = 0; j < length - i; j+=1)
-		# a = mas[j]
-		# b = mas[j+1]
-		# puts a
-		# puts b
-		# puts "HELL"
-		# if(a > b)
-		# 	buf = mas[j]
-		# 	mas[j] = mas[j+1]
-		# 	mas[j+1] = buf
-		# end
-		# if (a > "a")
-		# 	puts "HELL!"
-		# end
-		puts "\n=============="
-		puts mas[j]
-		buf = mas[j]
-		buf2 = mas[j+1]
-		mas[j] = buf2
-		mas[j+1] = buf
-		puts mas[j]
-		puts "==============\n"
-	end
-end
+# for(i = 1; i < length - 1; i+=1)
+# 	for(j = 0; j < length - i; j+=1)
+# 		if(mas[j] > mas[j+1])
+# 			buf = mas[j]
+# 			mas[j] = mas[j+1]
+# 			mas[j+1] = buf
+# 		end
+# 	end
+# end
+
+# for(i = 0; i < length; i+=1)
+# 	puts mas[i]
+# end
 
 
 # s = "hello"
