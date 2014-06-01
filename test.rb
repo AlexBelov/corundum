@@ -81,6 +81,12 @@
 # 	return b
 # end
 
+a = 4
+exp1 = 100+2*3/(3+4*3)
+exp2 = 100.5+2*3.1/(3+4*3)
+exp3 = "hello "*2
+exp4 = a + 2*3
+
 a = func(1)*func2(5)
 
 def func(a)
@@ -88,7 +94,7 @@ def func(a)
 end
 
 def func2(a)
-	return a*2
+	return 1
 end
 
 puts "Hello, I'm CORUN\"DUM"

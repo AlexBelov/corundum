@@ -39,12 +39,6 @@ if a<b and b<c
 	"lalala"
 end
 
-if a != nil
-	a = "1111"
-else
-	a = "2222"
-end
-
 unless 1 < 2
 	return a
 end

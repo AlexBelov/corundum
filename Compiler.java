@@ -1018,8 +1018,26 @@ public class Compiler {
             ByteArrayOutputStream out = stack_output_streams.pop();
             PrintStream ps = new PrintStream(out);
 
-            String return_val = string_values.get(ctx.getChild(1));
-            ps.println(".return(" + return_val + ")");
+            String type_arg = which_value.get(ctx.getChild(1));
+
+            switch(type_arg) {
+                case "Integer":
+                    int result_int = int_values.get(ctx.getChild(1));
+                    ps.println(".return(" + result_int + ")");
+                    break;
+                case "Float":
+                    float result_float = float_values.get(ctx.getChild(1));
+                    ps.println(".return(" + result_float + ")");
+                    break;
+                case "String":
+                    String result_string = string_values.get(ctx.getChild(1));
+                    ps.println(".return(" + result_string + ")");
+                    break;
+                case "Dynamic":
+                    result_string = string_values.get(ctx.getChild(1));
+                    ps.println(".return(" + result_string + ")");
+                    break;
+            }
 
             stack_output_streams.push(out);
         }

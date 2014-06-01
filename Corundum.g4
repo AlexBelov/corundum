@@ -47,7 +47,7 @@ function_definition_params_list : function_definition_param_id
 
 function_definition_param_id : id;
 
-return_statement : RETURN dynamic_result;
+return_statement : RETURN all_result;
 
 function_call : name=function_name LEFT_RBRACKET params=function_call_param_list RIGHT_RBRACKET
               | name=function_name params=function_call_param_list
