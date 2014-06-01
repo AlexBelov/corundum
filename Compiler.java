@@ -515,15 +515,33 @@ public class Compiler {
             ByteArrayOutputStream out = stack_output_streams.pop();
             PrintStream ps = new PrintStream(out);
             LinkedList<String> definitions = stack_definitions.pop();
+            String arr_def = string_values.get(ctx.getChild(0));
 
-            String var = ctx.var_id.getText();
+            String type_arg = which_value.get(ctx.getChild(2));
 
-            ps.println(var + ctx.arr_def.getText() + " = " + ctx.arr_val.getText());
-
-            if (!is_defined(definitions, var)) {
-                ps_error.println("line " + NumStr + " Error! Undefined variable " + var + "!");
-                SemanticErrorsNum++;
+            switch(type_arg) {
+                case "Integer":
+                    int result_int = int_values.get(ctx.getChild(2));
+                    ps.println(arr_def + " = " + result_int);
+                    break;
+                case "Float":
+                    float result_float = float_values.get(ctx.getChild(2));
+                    ps.println(arr_def + " = " + result_float);
+                    break;
+                case "String":
+                    String result_string = string_values.get(ctx.getChild(2));
+                    ps.println(arr_def + " = " + result_string);
+                    break;
+                case "Dynamic":
+                    result_string = string_values.get(ctx.getChild(2));
+                    ps.println(arr_def + " = " + result_string);
+                    break;
             }
+
+            // if (!is_defined(definitions, var)) {
+            //     ps_error.println("line " + NumStr + " Error! Undefined variable " + var + "!");
+            //     SemanticErrorsNum++;
+            // }
 
             stack_output_streams.push(out);
             stack_definitions.push(definitions);

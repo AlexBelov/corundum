@@ -149,6 +149,14 @@ for(i = 1; i < length - 1; i+=1)
 		# if (a > "a")
 		# 	puts "HELL!"
 		# end
+		puts "\n=============="
+		puts mas[j]
+		buf = mas[j]
+		buf2 = mas[j+1]
+		mas[j] = buf2
+		mas[j+1] = buf
+		puts mas[j]
+		puts "==============\n"
 	end
 end
 

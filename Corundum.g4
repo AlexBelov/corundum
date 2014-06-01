@@ -144,17 +144,13 @@ string_assignment : var_id=lvalue op=ASSIGN string_result
 
 initial_array_assignment : var_id=lvalue op=ASSIGN LEFT_SBRACKET RIGHT_SBRACKET;
 
-array_assignment : var_id=lvalue arr_def=array_definition op=ASSIGN arr_val=array_value;
+array_assignment : arr_def=array_selector op=ASSIGN arr_val=all_result;
 
 array_definition : LEFT_SBRACKET array_definition_elements RIGHT_SBRACKET;
 
-array_definition_elements : int_t
-                          | array_definition_elements COMMA int_t
+array_definition_elements : ( int_result | dynamic_result )
+                          | array_definition_elements COMMA ( int_result | dynamic_result )
                           ;
-
-array_value : ( int_t | float_t | literal_t )
-            | dynamic
-            ;
 
 array_selector : id LEFT_SBRACKET ( int_result | dynamic_result ) RIGHT_SBRACKET
                | id_global LEFT_SBRACKET ( int_result | dynamic_result ) RIGHT_SBRACKET
