@@ -80,6 +80,7 @@ public class Compiler {
                 case CorundumParser.ASSIGN:
                     String var = ctx.var_id.getText();
                     if (!is_defined(definitions, var)) {
+                        ps.println("");
                         ps.println(".local int " + ctx.var_id.getText());
                         definitions.add(ctx.var_id.getText());                        
                     }
@@ -162,6 +163,7 @@ public class Compiler {
                 case CorundumParser.ASSIGN:
                     String var = ctx.var_id.getText();
                     if (!is_defined(definitions, var)) {
+                        ps.println("");
                         ps.println(".local num " + ctx.var_id.getText());
                         definitions.add(ctx.var_id.getText());
                     }
@@ -262,6 +264,7 @@ public class Compiler {
                 case CorundumParser.ASSIGN:
                     String var = ctx.var_id.getText();
                     if (!is_defined(definitions, var)) {
+                        ps.println("");
                         ps.println(".local string " + ctx.var_id.getText());
                         definitions.add(ctx.var_id.getText());
                     }
@@ -354,6 +357,7 @@ public class Compiler {
                 case CorundumParser.ASSIGN:
                     String var = ctx.var_id.getText();
                     if (!is_defined(definitions, var)) {
+                        ps.println("");
                         ps.println(".local pmc " + ctx.var_id.getText());
                         ps.println(ctx.var_id.getText() + " = new \"Integer\"");
                         definitions.add(ctx.var_id.getText());
@@ -483,6 +487,7 @@ public class Compiler {
             String var = ctx.var_id.getText();
 
             if (!is_defined(definitions, var)) {
+                ps.println("");
                 ps.println(".local pmc " + var);
                 definitions.add(var);
             }
@@ -532,6 +537,7 @@ public class Compiler {
             String condition_var = string_values.get(ctx.getChild(1));
 
             Num_label++;
+            ps.println("");
             ps.println(cond.toString());
             ps.println("if " + condition_var + " goto label_" + Num_label);
             Num_label++;
