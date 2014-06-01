@@ -92,4 +92,5 @@ def func2(a)
 end
 
 puts "Hello, I'm CORUNDUM"
+puts 'hahaha!'
 puts a

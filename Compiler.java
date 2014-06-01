@@ -1041,7 +1041,8 @@ public class Compiler {
                     String str_terminal;
                     str_terminal = String.valueOf(symbol.getText());
                     str_terminal = str_terminal.replaceAll("\"", "");
-                    str_terminal = str_terminal.replaceAll("\'", "");
+                    str_terminal = str_terminal.replaceAll("\'$", "");
+                    str_terminal = str_terminal.replaceAll("^\'", "");
                     string_values.put(node, str_terminal);
                     which_value.put(node, "String");
                     break;
