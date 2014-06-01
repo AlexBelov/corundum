@@ -63,6 +63,7 @@ public class Compiler {
             ByteArrayOutputStream out = main_stream;
             PrintStream ps = new PrintStream(out);
 
+            ps.println("");
             ps.println(".end");
 
             stack_definitions.pop();
@@ -574,6 +575,7 @@ public class Compiler {
             String condition_var = string_values.get(ctx.getChild(1));
 
             Num_label++;
+            ps.println("");
             ps.println(cond.toString());
             ps.println("unless " + condition_var + " goto label_" + Num_label);
             Num_label++;
@@ -936,6 +938,18 @@ public class Compiler {
             stack_output_streams.push(assignment_stream);
         }
 
+        public void enterFunction_call_assignment(CorundumParser.Function_call_assignmentContext ctx) {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            stack_output_streams.push(out);
+        }
+
+        public void exitFunction_call_assignment(CorundumParser.Function_call_assignmentContext ctx) {
+            ByteArrayOutputStream out = stack_output_streams.pop();
+            String func_call = out.toString();
+            func_call = func_call.replaceAll("\n", "");
+            string_values.put(ctx, func_call);
+        }
+
         // ======================================== FUNCTION definition ========================================
 
         public void enterFunction_definition(CorundumParser.Function_definitionContext ctx) {
@@ -1048,6 +1062,6 @@ public class Compiler {
         walker.walk(eval, tree);
 
         ByteArrayOutputStream out = eval.stack_output_streams.pop();
-        System.out.println(out.toString());
+        System.out.print(out.toString());
     }
 }

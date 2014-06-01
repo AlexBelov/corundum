@@ -66,6 +66,8 @@ function_unnamed_param : ( int_result | float_result | string_result | dynamic_r
 
 function_named_param : id op=ASSIGN ( int_result | float_result | string_result | dynamic_result );
 
+function_call_assignment : function_call;
+
 all_result : ( int_result | float_result | string_result | dynamic_result );
 
 //if_elsif_statement : ELSIF cond_expression crlf statement_body
@@ -171,7 +173,7 @@ dynamic_result : dynamic_result op=( MUL | DIV | MOD ) int_result
 
 dynamic : id
         | id_global
-        | function_call
+        | function_call_assignment
         | array_selector
         ;
 
