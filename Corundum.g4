@@ -8,6 +8,7 @@ expression_list : expression terminator
                 ;
 
 expression : function_definition
+           | function_inline_call
            | require_block
            | if_statement
            | unless_statement
@@ -17,6 +18,8 @@ expression : function_definition
            | for_statement
            | pir_inline
            ;
+
+function_inline_call : function_call;
 
 require_block : REQUIRE literal_t;
 
@@ -153,8 +156,8 @@ array_value : ( int_t | float_t | literal_t )
             | dynamic
             ;
 
-array_selector : id LEFT_SBRACKET int_t RIGHT_SBRACKET
-               | id_global LEFT_SBRACKET int_t RIGHT_SBRACKET
+array_selector : id LEFT_SBRACKET ( int_result | dynamic_result ) RIGHT_SBRACKET
+               | id_global LEFT_SBRACKET ( int_result | dynamic_result ) RIGHT_SBRACKET
                ;
 
 dynamic_result : dynamic_result op=( MUL | DIV | MOD ) int_result
@@ -214,6 +217,7 @@ comparison : left=comp_var op=( LESS | GREATER | LESS_EQUAL | GREATER_EQUAL ) ri
            ;
 
 comp_var : all_result
+         | array_selector
          | id
          ;
 

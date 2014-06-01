@@ -530,8 +530,20 @@ public class Compiler {
         }
 
         public void exitArray_selector(CorundumParser.Array_selectorContext ctx) {
-            String var_selector = ctx.getText();
-            string_values.put(ctx, var_selector);
+            String name = string_values.get(ctx.getChild(0));
+            String type_arg = which_value.get(ctx.getChild(2));
+
+            switch(type_arg) {
+                case "Integer":
+                    int selector_int = int_values.get(ctx.getChild(2));
+                    string_values.put(ctx, name + "[" + selector_int + "]");
+                    break;
+                case "Dynamic":
+                    String selector_str = string_values.get(ctx.getChild(2));
+                    string_values.put(ctx, name + "[" + selector_str + "]");
+                    break;
+            }
+
             which_value.put(ctx, "Dynamic");
         }
 
@@ -578,10 +590,12 @@ public class Compiler {
             if (child_4.contains("else") || child_4.contains("elsif")) {
                 ps.println("goto label_" + label_end);
                 ps.println("label_" + label_false + ":");              
-                ps.println(else_body.toString());     
+                ps.println(else_body.toString());
+                ps.println("label_" + label_end + ":");     
             }
-
-            ps.println("label_" + label_end + ":");
+            else {
+                ps.println("label_" + label_false + ":");
+            }
 
             stack_output_streams.push(out);
         }
@@ -690,10 +704,12 @@ public class Compiler {
             if (child_4.contains("else") || child_4.contains("elsif")) {
                 ps.println("goto label_" + label_end);
                 ps.println("label_" + label_false + ":");              
-                ps.println(else_body.toString());     
+                ps.println(else_body.toString());
+                ps.println("label_" + label_end + ":");     
             }
-
-            ps.println("label_" + label_end + ":");
+            else {
+                ps.println("label_" + label_false + ":");
+            }
 
             stack_output_streams.push(out);
         }
@@ -770,7 +786,7 @@ public class Compiler {
             ByteArrayOutputStream out = stack_output_streams.pop();
             PrintStream ps = new PrintStream(out);
 
-            if ( ctx.getChildCount() == 3 ) {
+            if ( ctx.getChildCount() == 3 && ctx.op != null ) {
                 String left = string_values.get(ctx.getChild(0));
                 String right = string_values.get(ctx.getChild(2));     
 
@@ -791,6 +807,9 @@ public class Compiler {
 
                 string_values.put(ctx, "$I" + Num_reg_int);
                 Num_reg_int++;
+            }
+            else if ( ctx.getChildCount() == 3 && ctx.op == null ) {
+                string_values.put(ctx, string_values.get(ctx.getChild(1)));
             }
             else if ( ctx.getChildCount() == 1 ) {
                 string_values.put(ctx, string_values.get(ctx.getChild(0)));
@@ -957,6 +976,13 @@ public class Compiler {
 
         // ======================================== FUNCTION call ========================================
 
+        public void exitFunction_inline_call(CorundumParser.Function_inline_callContext ctx) {
+            ByteArrayOutputStream out = stack_output_streams.pop();
+            PrintStream ps = new PrintStream(out);
+            ps.println(string_values.get(ctx.getChild(0)));
+            stack_output_streams.push(out);
+        }
+
         public void enterFunction_call(CorundumParser.Function_callContext ctx) {
             ByteArrayOutputStream out = stack_output_streams.pop();
             ByteArrayOutputStream assignment_stream = new ByteArrayOutputStream();
@@ -978,7 +1004,7 @@ public class Compiler {
             // ASSIGNMENT of dynamic function params
             ps.println(assignment_stream.toString());
             // call of function
-            ps.println(func_name + "(" + args + ")");
+            string_values.put(ctx, func_name + "(" + args + ")");
 
             function_calls.add(func_name);
 
@@ -1049,10 +1075,16 @@ public class Compiler {
         }
 
         public void exitFunction_call_assignment(CorundumParser.Function_call_assignmentContext ctx) {
+            ByteArrayOutputStream func = stack_output_streams.pop();
             ByteArrayOutputStream out = stack_output_streams.pop();
-            String func_call = out.toString();
-            func_call = func_call.replaceAll("\n", "");
-            string_values.put(ctx, func_call);
+            String func_call = func.toString();
+            PrintStream ps = new PrintStream(out);
+
+            ps.print(func_call);
+
+            string_values.put(ctx, string_values.get(ctx.getChild(0)));
+            which_value.put(ctx, "Dynamic");
+            stack_output_streams.push(out);
         }
 
         // ======================================== FUNCTION definition ========================================

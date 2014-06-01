@@ -1,4 +1,4 @@
-.sub print
+.sub p
   .param pmc str
   $P1 = new "String"
   $P1 = str
@@ -54,8 +54,10 @@
   $P0 = open $S0, "r"
 loop_file:
   $S0 = readline $P0
+  if $S0 == "" goto end_loop
   push array, $S0
   if $P0 goto loop_file
+end_loop:
   .return(array)
 .end
 
@@ -72,6 +74,6 @@ loop_file:
   print $P0, $S0
   $I0 = $I0 + 1
   $S1 = $P1[$I0]
-  if $I0 <= $I1 goto loop_file
+  if $I0 < $I1 goto loop_file
   close $P0
 .end

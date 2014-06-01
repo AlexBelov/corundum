@@ -87,25 +87,25 @@
 # exp3 = "hello "*2
 # exp4 = a + 2*3
 
-a = func(1)*func2(5)
+# a = func(1)*func2(5)
 
-if "a" < "b"
-	puts "a < b"
-else
-	puts "a > b"
-end
+# if "a" < "b"
+# 	puts "a < b"
+# else
+# 	puts "a > b"
+# end
 
-def func(a)
-	return a*2
-end
+# def func(a)
+# 	return a*2
+# end
 
-def func2(a)
-	return 1
-end
+# def func2(a)
+# 	return 1
+# end
 
-puts "Hello, I'm CORUN\"DUM"
-puts 'hahaha!'
-puts a
+# puts "Hello, I'm CORUN\"DUM"
+# puts 'hahaha!'
+# puts a
 
 # if 'a' > 'b'
 # 	puts "a > b"
@@ -127,4 +127,39 @@ puts a
 # 	puts "c > d"
 # else
 # 	puts "c < d"
+# end
+
+mas = []
+mas = read_file("test.txt")
+
+length = len(mas)
+
+for(i = 1; i < length - 1; i+=1)
+	for(j = 0; j < length - i; j+=1)
+		# a = mas[j]
+		# b = mas[j+1]
+		# puts a
+		# puts b
+		# puts "HELL"
+		# if(a > b)
+		# 	buf = mas[j]
+		# 	mas[j] = mas[j+1]
+		# 	mas[j+1] = buf
+		# end
+		# if (a > "a")
+		# 	puts "HELL!"
+		# end
+	end
+end
+
+
+# s = "hello"
+# l = len(s)
+# puts l
+
+# a = func(1,2)
+# puts a
+
+# def func a, b
+# 	return a+b
 # end
