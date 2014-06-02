@@ -64,15 +64,10 @@ sub overwrite {
 my $file = $ARGV[0];
 our $script_dir = cwd; #Cwd::realpath($0); #chdir
 
-open our $f_result, '>', 'new'.$file or die "Can't write new file: $!";
+open our $f_result, '>', '.compiled.rb' or die "Can't write new file: $!";
 my $f_open = open_file($file);
 
 overwrite($f_open, "");
 
 close $f_open;
 close $f_result;
-
-
-
-
-
