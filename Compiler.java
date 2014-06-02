@@ -69,7 +69,7 @@ public class Compiler {
             PrintStream ps = new PrintStream(out);
 
             ps.println("\n.end");
-            ps.println("\n.include \"std.pir\"");
+            ps.println("\n.include \"stdlib.pir\"");
 
             for (int i = 0; i < function_calls.size(); i++) {
                 String func_name = function_calls.get(i);

@@ -77,3 +77,9 @@ loop_file:
   if $I0 < $I1 goto loop_file
   close $P0
 .end
+
+.sub sort
+  .param pmc mas
+  mas.'sort'()
+  .return(mas)
+.end
