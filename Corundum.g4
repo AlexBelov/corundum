@@ -19,6 +19,12 @@ expression : function_definition
            | pir_inline
            ;
 
+global_get : lvalue op=ASSIGN id_global;
+
+global_set : id_global op=ASSIGN all_result;
+
+global_result : id_global;
+
 function_inline_call : function_call;
 
 require_block : REQUIRE literal_t;
@@ -71,7 +77,7 @@ function_named_param : id op=ASSIGN ( int_result | float_result | string_result 
 
 function_call_assignment : function_call;
 
-all_result : ( int_result | float_result | string_result | dynamic_result );
+all_result : ( int_result | float_result | string_result | dynamic_result | global_result );
 
 elsif_statement : if_elsif_statement;
 
@@ -173,7 +179,6 @@ dynamic_result : dynamic_result op=( MUL | DIV | MOD ) int_result
                ;
 
 dynamic : id
-        | id_global
         | function_call_assignment
         | array_selector
         ;
@@ -218,7 +223,7 @@ comp_var : all_result
          ;
 
 lvalue : id  
-       | id_global        
+       //| id_global        
        ;
 
 rvalue : lvalue 
@@ -230,6 +235,8 @@ rvalue : lvalue
        | float_result
        | string_result
 
+       | global_set
+       | global_get
        | dynamic_assignment
        | string_assignment
        | float_assignment
