@@ -71,7 +71,9 @@ end_loop:
   $I0 = 0
 loop_file:
   $S0 = $P1[$I0]
+  if $S0 == "\n" goto loop_file_1
   print $P0, $S0
+loop_file_1:
   $I0 = $I0 + 1
   $S1 = $P1[$I0]
   if $I0 < $I1 goto loop_file
