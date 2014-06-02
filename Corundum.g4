@@ -19,9 +19,9 @@ expression : function_definition
            | pir_inline
            ;
 
-global_get : lvalue op=ASSIGN id_global;
+global_get : var_name=lvalue op=ASSIGN global_name=id_global;
 
-global_set : id_global op=ASSIGN all_result;
+global_set : global_name=id_global op=ASSIGN result=all_result;
 
 global_result : id_global;
 

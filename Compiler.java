@@ -83,6 +83,61 @@ public class Compiler {
             stack_output_streams.push(out);
         }
 
+        // ======================================== Global ========================================
+
+        public void exitGlobal_get(CorundumParser.Global_getContext ctx) {
+            ByteArrayOutputStream out = stack_output_streams.pop();
+            LinkedList<String> definitions = stack_definitions.pop();
+            PrintStream ps = new PrintStream(out);
+
+            String var = ctx.var_name.getText();
+            String global = ctx.global_name.getText();
+
+            if (!is_defined(definitions, var)) {
+                ps.println("");
+                ps.println(".local pmc " + var);
+                ps.println(var + " = new \"Integer\"");
+                definitions.add(var);
+            }
+
+            ps.println("get_global " + var + ", \"" + global + "\"");
+
+            stack_output_streams.push(out);
+            stack_definitions.push(definitions);
+        }
+
+        public void exitGlobal_set(CorundumParser.Global_setContext ctx) {
+            ByteArrayOutputStream out = stack_output_streams.pop();
+            LinkedList<String> definitions = stack_definitions.pop();
+            PrintStream ps = new PrintStream(out);
+
+            String global = ctx.global_name.getText();
+
+            String type_arg = which_value.get(ctx.getChild(2));
+
+            switch(type_arg) {
+                case "Integer":
+                    int result_int = int_values.get(ctx.getChild(2));
+                    ps.println("set_global \"" + global + "\", " + result_int);
+                    break;
+                case "Float":
+                    float result_float = float_values.get(ctx.getChild(2));
+                    ps.println("set_global \"" + global + "\", " + result_float);
+                    break;
+                case "String":
+                    String result_string = string_values.get(ctx.getChild(2));
+                    ps.println("set_global \"" + global + "\", " + result_string);
+                    break;
+                case "Dynamic":
+                    result_string = string_values.get(ctx.getChild(2));
+                    ps.println("set_global \"" + global + "\", " + result_string);
+                    break;
+            }
+
+            stack_output_streams.push(out);
+            stack_definitions.push(definitions);
+        }
+
         // ======================================== Integer ========================================
 
         public void enterInt_assignment(CorundumParser.Int_assignmentContext ctx) {

@@ -1,5 +1,13 @@
-$global = 42
+a = []
+a[1] = 456
+
+$global = a[1]
 not_global = $global
+puts not_global
+not_global = 123
+$global = not_global
+a = $global
+puts a
 
 # mas = []
 # mas = read_file("lab4.txt")
