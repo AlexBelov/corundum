@@ -7,7 +7,7 @@ Next step - compilation into deb package and maybe adding object oriented featur
 ### Prerequisites
 
 1. [ANTLR4](http://www.antlr.org/)
-2. [Parrot VM](http://www.parrot.org/)
+2. [Parrot VM](https://github.com/parrot/parrot)
 
 ### Running Corundum
 

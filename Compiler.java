@@ -150,7 +150,8 @@ public class Compiler {
                     String var = ctx.var_id.getText();
                     if (!is_defined(definitions, var)) {
                         ps.println("");
-                        ps.println(".local int " + ctx.var_id.getText());
+                        ps.println(".local pmc " + ctx.var_id.getText());
+                        ps.println(ctx.var_id.getText() + "= new \"Integer\"");
                         definitions.add(ctx.var_id.getText());                        
                     }
                     break;
@@ -233,7 +234,8 @@ public class Compiler {
                     String var = ctx.var_id.getText();
                     if (!is_defined(definitions, var)) {
                         ps.println("");
-                        ps.println(".local num " + ctx.var_id.getText());
+                        ps.println(".local pmc " + ctx.var_id.getText());
+                        ps.println(ctx.var_id.getText() + "= new \"Double\"");
                         definitions.add(ctx.var_id.getText());
                     }
                     break;
@@ -334,7 +336,8 @@ public class Compiler {
                     String var = ctx.var_id.getText();
                     if (!is_defined(definitions, var)) {
                         ps.println("");
-                        ps.println(".local string " + ctx.var_id.getText());
+                        ps.println(".local pmc " + ctx.var_id.getText());
+                        ps.println(ctx.var_id.getText() + "= new \"String\"");
                         definitions.add(ctx.var_id.getText());
                     }
                     break;
