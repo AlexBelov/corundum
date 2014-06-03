@@ -1,7 +1,10 @@
+file_name = ""
+file_name = gets()
+
 mas = []
-mas = read_file "test/lab4.txt"
+mas = read_file file_name
 mas = sort mas
-# puts_mas mas
+puts_mas mas
 write_file "test/lab4_sorted.txt", mas
 
 def puts_mas mas

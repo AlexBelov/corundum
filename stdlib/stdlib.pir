@@ -17,7 +17,18 @@
   .local string str
   stdin = getstdin
   str = stdin.'readline'()
-  .return(str)
+  $I0 = len(str)
+  $I0 -= 1
+  $P0 = split "", str
+  $I1 = 0
+  $P1 = new "ResizablePMCArray"
+loop_truncate:
+  $S1 = $P0[$I1]
+  push $P1, $S1
+  inc $I1
+  if $I1 < $I0 goto loop_truncate
+  $S2 = join "", $P1
+  .return($S2)
 .end
 
 .sub len
